@@ -329,6 +329,9 @@ def build_session_summary(
             pass
 
     time_series = build_time_series(all_strides)
+    speed_zones = build_speed_zones(all_strides)
+    fatigue = build_fatigue_analysis(left_strides, right_strides)
+    bilateral = build_bilateral_table(left_strides, right_strides)
 
     return {
         "date": session_date,
@@ -347,6 +350,7 @@ def build_session_summary(
             "avg_fsa_deg": safe_mean(all_fsa),
             "avg_vgrf_bw": safe_mean(all_vgrf),
             "avg_vgrf_peak_bw": safe_mean(all_vgrf_peak),
+            "avg_loading_rate": safe_mean(extract(all_strides, "loading_rate")),
         },
         "asymmetry": {
             "gct_ms": gct_asymmetry,
@@ -355,20 +359,190 @@ def build_session_summary(
         },
         "left_summary": {
             "avg_gct_ms": safe_mean(left_gct),
+            "std_gct_ms": safe_std(left_gct),
             "avg_stride_len_m": safe_mean(left_stride),
             "avg_fsa_deg": safe_mean(left_fsa),
+            "std_fsa_deg": safe_std(left_fsa),
             "avg_vgrf_bw": safe_mean(extract(left_strides, "vgrf_avg")),
             "avg_vgrf_peak_bw": safe_mean(extract(left_strides, "vgrf_peak")),
+            "avg_loading_rate": safe_mean(extract(left_strides, "loading_rate")),
         },
         "right_summary": {
             "avg_gct_ms": safe_mean(right_gct),
+            "std_gct_ms": safe_std(right_gct),
             "avg_stride_len_m": safe_mean(right_stride),
             "avg_fsa_deg": safe_mean(right_fsa),
+            "std_fsa_deg": safe_std(right_fsa),
             "avg_vgrf_bw": safe_mean(extract(right_strides, "vgrf_avg")),
             "avg_vgrf_peak_bw": safe_mean(extract(right_strides, "vgrf_peak")),
+            "avg_loading_rate": safe_mean(extract(right_strides, "loading_rate")),
         },
+        "bilateral": bilateral,
+        "speed_zones": speed_zones,
+        "fatigue": fatigue,
         "time_series": time_series,
     }
+
+
+SPEED_ZONE_BOUNDS = [
+    ("recovery", 0, 2.5),
+    ("easy", 2.5, 3.5),
+    ("moderate", 3.5, 4.5),
+    ("tempo", 4.5, 5.5),
+    ("fast", 5.5, 7.0),
+    ("sprint", 7.0, 100),
+]
+
+
+def build_speed_zones(strides: list[dict]) -> list[dict]:
+    """Bin strides into speed zones and compute per-zone metrics."""
+    zones = []
+    for zone_name, lo, hi in SPEED_ZONE_BOUNDS:
+        zone_strides = [
+            s for s in strides
+            if s.get("speed_mps") is not None and lo <= s["speed_mps"] < hi
+        ]
+        if not zone_strides:
+            continue
+        zones.append({
+            "zone": zone_name,
+            "count": len(zone_strides),
+            "speed_range": [lo, hi],
+            "avg_speed": safe_mean([s["speed_mps"] for s in zone_strides]),
+            "avg_gct_ms": safe_mean([s.get("gct_ms") for s in zone_strides if s.get("gct_ms")]),
+            "avg_fsa_deg": safe_mean([s.get("fsa_deg") for s in zone_strides if s.get("fsa_deg") is not None]),
+            "avg_vgrf_bw": safe_mean([s.get("vgrf_avg") for s in zone_strides if s.get("vgrf_avg")]),
+            "avg_vgrf_peak_bw": safe_mean([s.get("vgrf_peak") for s in zone_strides if s.get("vgrf_peak")]),
+            "avg_stride_len_m": safe_mean([s.get("stride_len_m") for s in zone_strides if s.get("stride_len_m")]),
+            "avg_cadence": safe_mean([s.get("cadence") for s in zone_strides if s.get("cadence")]),
+            "avg_loading_rate": safe_mean([s.get("loading_rate") for s in zone_strides if s.get("loading_rate")]),
+        })
+    return zones
+
+
+def build_fatigue_analysis(left_strides: list[dict], right_strides: list[dict]) -> dict | None:
+    """Compare first quarter vs last quarter to detect fatigue drift."""
+    all_strides = left_strides + right_strides
+    if len(all_strides) < 20:
+        return None
+
+    sorted_all = sorted(all_strides, key=lambda s: parse_timestamp_for_sort(s.get("timestamp")))
+    q_len = len(sorted_all) // 4
+    if q_len < 5:
+        return None
+
+    first_q = sorted_all[:q_len]
+    last_q = sorted_all[-q_len:]
+
+    def drift(metric):
+        first_vals = [s.get(metric) for s in first_q if s.get(metric) is not None]
+        last_vals = [s.get(metric) for s in last_q if s.get(metric) is not None]
+        first_m = safe_mean(first_vals)
+        last_m = safe_mean(last_vals)
+        if first_m is None or last_m is None or first_m == 0:
+            return None
+        return {
+            "first_q": first_m,
+            "last_q": last_m,
+            "change": round(last_m - first_m, 3),
+            "pct_change": round((last_m - first_m) / abs(first_m) * 100, 1),
+        }
+
+    def side_drift(strides, metric):
+        sorted_s = sorted(strides, key=lambda s: parse_timestamp_for_sort(s.get("timestamp")))
+        ql = len(sorted_s) // 4
+        if ql < 3:
+            return None
+        first_vals = [s.get(metric) for s in sorted_s[:ql] if s.get(metric) is not None]
+        last_vals = [s.get(metric) for s in sorted_s[-ql:] if s.get(metric) is not None]
+        fm = safe_mean(first_vals)
+        lm = safe_mean(last_vals)
+        if fm is None or lm is None or fm == 0:
+            return None
+        return {
+            "first_q": fm,
+            "last_q": lm,
+            "change": round(lm - fm, 3),
+            "pct_change": round((lm - fm) / abs(fm) * 100, 1),
+        }
+
+    result = {
+        "gct_ms": drift("gct_ms"),
+        "vgrf_bw": drift("vgrf_avg"),
+        "speed_mps": drift("speed_mps"),
+        "cadence": drift("cadence"),
+        "stride_len_m": drift("stride_len_m"),
+    }
+
+    if left_strides and right_strides:
+        result["left_gct"] = side_drift(left_strides, "gct_ms")
+        result["right_gct"] = side_drift(right_strides, "gct_ms")
+        result["left_vgrf"] = side_drift(left_strides, "vgrf_avg")
+        result["right_vgrf"] = side_drift(right_strides, "vgrf_avg")
+
+        l_first = safe_mean([s.get("gct_ms") for s in sorted(left_strides, key=lambda s: parse_timestamp_for_sort(s.get("timestamp")))[:max(1, len(left_strides)//4)] if s.get("gct_ms")])
+        r_first = safe_mean([s.get("gct_ms") for s in sorted(right_strides, key=lambda s: parse_timestamp_for_sort(s.get("timestamp")))[:max(1, len(right_strides)//4)] if s.get("gct_ms")])
+        l_last = safe_mean([s.get("gct_ms") for s in sorted(left_strides, key=lambda s: parse_timestamp_for_sort(s.get("timestamp")))[-max(1, len(left_strides)//4):] if s.get("gct_ms")])
+        r_last = safe_mean([s.get("gct_ms") for s in sorted(right_strides, key=lambda s: parse_timestamp_for_sort(s.get("timestamp")))[-max(1, len(right_strides)//4):] if s.get("gct_ms")])
+
+        if all(v is not None for v in [l_first, r_first, l_last, r_last]):
+            result["asymmetry_drift"] = {
+                "gct_first_q": round(l_first - r_first, 1),
+                "gct_last_q": round(l_last - r_last, 1),
+            }
+
+    return result
+
+
+def build_bilateral_table(left_strides: list[dict], right_strides: list[dict]) -> list[dict]:
+    """Build detailed L/R comparison table with std devs and assessment."""
+    if not left_strides or not right_strides:
+        return []
+
+    def extract(strides, key):
+        return [s.get(key) for s in strides if s.get(key) is not None]
+
+    metrics = [
+        ("Ground Contact Time", "gct_ms", "ms", 10),
+        ("Foot Strike Angle", "fsa_deg", "°", 3),
+        ("vGRF Average", "vgrf_avg", "BW", 0.1),
+        ("vGRF Peak", "vgrf_peak", "BW", 0.15),
+        ("Stride Length", "stride_len_m", "m", 0.05),
+        ("Loading Rate", "loading_rate", "BW/s", 5),
+    ]
+
+    rows = []
+    for label, key, unit, warn_threshold in metrics:
+        lv = extract(left_strides, key)
+        rv = extract(right_strides, key)
+        if not lv or not rv:
+            continue
+        lm = safe_mean(lv)
+        rm = safe_mean(rv)
+        ls = safe_std(lv)
+        rs = safe_std(rv)
+        diff = round(lm - rm, 3) if lm and rm else None
+        assessment = "—"
+        if diff is not None:
+            ad = abs(diff)
+            if ad < warn_threshold * 0.5:
+                assessment = "Excellent"
+            elif ad < warn_threshold:
+                assessment = "Normal"
+            else:
+                assessment = "Monitor"
+
+        rows.append({
+            "label": label,
+            "unit": unit,
+            "left_mean": lm,
+            "left_std": ls,
+            "right_mean": rm,
+            "right_std": rs,
+            "diff": diff,
+            "assessment": assessment,
+        })
+    return rows
 
 
 def parse_timestamp_for_sort(ts) -> float:

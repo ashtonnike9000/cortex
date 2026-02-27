@@ -1,0 +1,60 @@
+.sz-wrap {
+  overflow-x: auto;
+}
+
+.sz-bars {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 0.25rem;
+}
+
+.sz-bar-segment {
+  border-radius: 2px;
+  min-width: 4px;
+}
+
+.sz-bar-labels {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.sz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.sz-table th {
+  font-size: 0.63rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.sz-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sz-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+}
+
+.sz-name {
+  text-transform: capitalize;
+  font-weight: 500;
+}
