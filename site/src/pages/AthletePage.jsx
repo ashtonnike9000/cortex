@@ -11,21 +11,21 @@ import FatiguePanel from "../components/charts/FatiguePanel";
 import Tabs from "../components/layout/Tabs";
 import "./AthletePage.css";
 
+const ALL_RUNS_KEY = "__ALL_RUNS__";
+
 export default function AthletePage() {
   const { id } = useParams();
   const [athlete, setAthlete] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionKey, setSessionKey] = useState(ALL_RUNS_KEY);
 
   useEffect(() => {
     setLoading(true);
     fetchAthlete(id)
       .then((data) => {
         setAthlete(data);
-        if (data.sessions?.length) {
-          setSelectedSession(data.sessions[data.sessions.length - 1]);
-        }
+        setSessionKey(ALL_RUNS_KEY);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -35,64 +35,109 @@ export default function AthletePage() {
   if (error) return <div className="error">{error}</div>;
   if (!athlete) return <div className="error">Athlete not found</div>;
 
-  const m = selectedSession?.metrics;
+  const isAllRuns = sessionKey === ALL_RUNS_KEY;
+  const currentSession = isAllRuns
+    ? athlete.aggregate
+    : athlete.sessions.find((s) => s.date + s.label === sessionKey);
+
+  const m = currentSession?.metrics;
+  const insights = athlete.insights || [];
+  const headlineInsights = insights.slice(0, 2);
+
+  const tabInsights = (category) =>
+    insights.filter((i) => i.category === category || (category === "overview" && i.severity === "action"));
 
   const tabs = [
     {
       id: "overview",
       label: "Overview",
-      content: <OverviewTab session={selectedSession} metrics={m} />,
+      content: (
+        <OverviewTab
+          session={currentSession}
+          metrics={m}
+          insights={tabInsights("overview")}
+          isAllRuns={isAllRuns}
+          totalStrides={athlete.total_strides}
+          sessionCount={athlete.session_count}
+        />
+      ),
     },
     {
       id: "biomechanics",
       label: "Biomechanics",
-      content: <BiomechanicsTab session={selectedSession} />,
+      content: <BiomechanicsTab session={currentSession} insights={[...tabInsights("biomechanics"), ...tabInsights("asymmetry")]} />,
     },
     {
       id: "speed",
       label: "Speed Zones",
-      content: <SpeedZonesTab session={selectedSession} />,
+      content: <SpeedZonesTab session={currentSession} insights={tabInsights("speed")} />,
     },
     {
       id: "fatigue",
       label: "Fatigue",
-      content: <FatigueTab session={selectedSession} />,
+      content: <FatigueTab session={currentSession} insights={tabInsights("fatigue")} />,
     },
     {
       id: "trends",
       label: "Trends",
-      content: <TrendsTab sessions={athlete.sessions} />,
+      content: <TrendsTab sessions={athlete.sessions} insights={tabInsights("trends")} />,
     },
   ];
 
   return (
     <div className="athlete-page">
-      {/* Hero header */}
       <div className="athlete-hero">
         <div className="hero-content">
-          <h1 className="athlete-name">{athlete.name}</h1>
-          <p className="athlete-meta">
-            {athlete.session_count} sessions &middot;{" "}
-            {athlete.total_strides.toLocaleString()} strides &middot;{" "}
-            {athlete.date_range.first} to {athlete.date_range.last}
-          </p>
+          <div className="hero-top">
+            <div>
+              <h1 className="athlete-name">{athlete.name}</h1>
+              <p className="athlete-meta">
+                {athlete.session_count} sessions &middot;{" "}
+                {athlete.total_strides.toLocaleString()} strides &middot;{" "}
+                {athlete.date_range.first} &rarr; {athlete.date_range.last}
+              </p>
+            </div>
+          </div>
+
           <div className="hero-stats">
             <HeroStat value={athlete.total_strides.toLocaleString()} label="Total Strides" />
             <HeroStat value={athlete.session_count} label="Sessions" />
-            <HeroStat value={athlete.data_source} label="Source" />
+            <HeroStat
+              value={athlete.aggregate?.metrics?.avg_speed_mps?.toFixed(2)}
+              label="Lifetime Speed"
+              unit="m/s"
+            />
+            <HeroStat
+              value={athlete.aggregate?.metrics?.avg_gct_ms?.toFixed(0)}
+              label="Lifetime GCT"
+              unit="ms"
+            />
           </div>
+
+          {headlineInsights.length > 0 && (
+            <div className="hero-insights">
+              {headlineInsights.map((ins, i) => (
+                <InsightCard key={i} insight={ins} compact />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Session selector */}
       <div className="session-selector">
-        <div className="section-title">Session</div>
         <div className="session-pills">
+          <button
+            className={`pill pill-all ${isAllRuns ? "active" : ""}`}
+            onClick={() => setSessionKey(ALL_RUNS_KEY)}
+          >
+            ALL RUNS
+            <span className="pill-sub">{athlete.total_strides.toLocaleString()} strides</span>
+          </button>
           {athlete.sessions.map((s) => (
             <button
               key={s.date + s.label}
-              className={`pill ${selectedSession === s ? "active" : ""}`}
-              onClick={() => setSelectedSession(s)}
+              className={`pill ${sessionKey === s.date + s.label ? "active" : ""}`}
+              onClick={() => setSessionKey(s.date + s.label)}
             >
               {s.date}
               <span className="pill-sub">{s.n_strides} strides</span>
@@ -101,105 +146,106 @@ export default function AthletePage() {
         </div>
       </div>
 
-      {/* Tabbed content */}
-      {selectedSession && <Tabs tabs={tabs} />}
+      {currentSession && <Tabs tabs={tabs} />}
     </div>
   );
 }
 
-function HeroStat({ value, label }) {
+function HeroStat({ value, label, unit }) {
   return (
     <div className="hero-stat">
-      <div className="hero-stat-value">{value}</div>
+      <div className="hero-stat-value">
+        {value ?? "—"}
+        {unit && <span className="hero-stat-unit">{unit}</span>}
+      </div>
       <div className="hero-stat-label">{label}</div>
     </div>
   );
 }
 
-function OverviewTab({ session, metrics }) {
+export function InsightCard({ insight, compact }) {
+  return (
+    <div className={`insight-card severity-${insight.severity} ${compact ? "compact" : ""}`}>
+      <div className="insight-badge">{insight.category}</div>
+      <div className="insight-title">{insight.title}</div>
+      {!compact && <div className="insight-text">{insight.text}</div>}
+    </div>
+  );
+}
+
+function InsightStack({ insights }) {
+  if (!insights || insights.length === 0) return null;
+  return (
+    <div className="insight-stack">
+      {insights.map((ins, i) => (
+        <InsightCard key={i} insight={ins} />
+      ))}
+    </div>
+  );
+}
+
+function OverviewTab({ session, metrics, insights, isAllRuns, totalStrides, sessionCount }) {
   if (!session || !metrics) return null;
   const m = metrics;
-
   return (
     <>
-      <div className="metric-grid">
-        <MetricCard label="Avg Speed" value={m.avg_speed_mps?.toFixed(1)} unit="m/s" color="var(--accent)" />
-        <MetricCard label="Max Speed" value={m.max_speed_mps?.toFixed(1)} unit="m/s" />
+      {isAllRuns && (
+        <div className="all-runs-banner">
+          Aggregate view across {sessionCount} sessions and {totalStrides?.toLocaleString()} strides
+        </div>
+      )}
+      <InsightStack insights={insights} />
+      <div className="metric-grid" style={{ marginTop: "1rem" }}>
+        <MetricCard label="Avg Speed" value={m.avg_speed_mps?.toFixed(2)} unit="m/s" color="var(--accent)" />
+        <MetricCard label="Max Speed" value={m.max_speed_mps?.toFixed(2)} unit="m/s" />
         <MetricCard label="Avg GCT" value={m.avg_gct_ms?.toFixed(0)} unit="ms" color="var(--green)" />
         <MetricCard label="GCT Std Dev" value={m.std_gct_ms?.toFixed(0)} unit="ms" />
-        <MetricCard label="Avg Stride" value={m.avg_stride_len_m?.toFixed(2)} unit="m" color="var(--cyan)" />
+        <MetricCard label="Avg Stride" value={m.avg_stride_len_m?.toFixed(2)} unit="m" />
         <MetricCard label="Cadence" value={m.avg_cadence_spm?.toFixed(0)} unit="spm" />
         <MetricCard label="Avg vGRF" value={m.avg_vgrf_bw?.toFixed(2)} unit="BW" color="var(--amber)" />
         <MetricCard label="Peak vGRF" value={m.avg_vgrf_peak_bw?.toFixed(2)} unit="BW" />
         <MetricCard label="FSA" value={m.avg_fsa_deg?.toFixed(1)} unit="°" />
       </div>
-
-      <div style={{ marginTop: "1.5rem" }}>
-        <div className="section-title">Speed &amp; Ground Contact</div>
-        <div className="card">
-          <SessionChart timeSeries={session.time_series} metrics={["speed", "gct"]} height={220} />
-        </div>
-      </div>
-
-      <div style={{ marginTop: "1rem" }}>
-        <div className="section-title">Cadence &amp; Loading</div>
-        <div className="card">
-          <SessionChart timeSeries={session.time_series} metrics={["cadence", "vgrf"]} height={220} />
-        </div>
-      </div>
+      {session.time_series && (
+        <>
+          <div style={{ marginTop: "1.5rem" }}>
+            <div className="section-label">Speed & Ground Contact</div>
+            <div className="card">
+              <SessionChart timeSeries={session.time_series} metrics={["speed", "gct"]} height={220} />
+            </div>
+          </div>
+          <div style={{ marginTop: "1rem" }}>
+            <div className="section-label">Cadence & Loading</div>
+            <div className="card">
+              <SessionChart timeSeries={session.time_series} metrics={["cadence", "vgrf"]} height={220} />
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
 
-function BiomechanicsTab({ session }) {
+function BiomechanicsTab({ session, insights }) {
   if (!session) return null;
-
   return (
     <>
-      <div className="section-title">Left vs Right — Full Metric Breakdown</div>
+      <InsightStack insights={insights} />
+      <div className="section-label" style={{ marginTop: "1rem" }}>Bilateral Comparison</div>
       <div className="card">
         <BilateralTable bilateral={session.bilateral} />
       </div>
-
       <div style={{ marginTop: "1.5rem" }}>
-        <div className="section-title">Asymmetry Visualization</div>
+        <div className="section-label">Asymmetry Visualization</div>
         <div className="card">
-          <AsymmetryBar
-            leftSummary={session.left_summary}
-            rightSummary={session.right_summary}
-            height={220}
-          />
+          <AsymmetryBar leftSummary={session.left_summary} rightSummary={session.right_summary} height={220} />
         </div>
       </div>
-
-      {session.asymmetry?.gct_ms != null && (
-        <div className="insight-box" style={{ marginTop: "1rem" }}>
-          <strong>Bilateral Assessment:</strong> GCT asymmetry of{" "}
-          <strong>{Math.abs(session.asymmetry.gct_ms).toFixed(1)} ms</strong>
-          {Math.abs(session.asymmetry.gct_ms) < 8
-            ? " is within normal range — good bilateral symmetry."
-            : Math.abs(session.asymmetry.gct_ms) < 15
-            ? " is slightly elevated — worth monitoring across sessions."
-            : " is significant — may indicate a compensation pattern worth investigating."}
-          {session.asymmetry.gct_ms > 0 ? " Left foot has longer ground contact." : " Right foot has longer ground contact."}
-        </div>
-      )}
-
       <div style={{ marginTop: "1.5rem" }}>
-        <div className="section-title">Per-Side Summary</div>
+        <div className="section-label">Per-Side Summary</div>
         <div className="side-compare">
-          <SideCard
-            title="Left Foot"
-            summary={session.left_summary}
-            count={session.n_left}
-            color="var(--accent)"
-          />
-          <SideCard
-            title="Right Foot"
-            summary={session.right_summary}
-            count={session.n_right}
-            color="var(--amber)"
-          />
+          <SideCard title="Left Foot" summary={session.left_summary} count={session.n_left} color="var(--accent)" />
+          <SideCard title="Right Foot" summary={session.right_summary} count={session.n_right} color="var(--amber)" />
         </div>
       </div>
     </>
@@ -233,89 +279,73 @@ function SideStat({ label, value, unit, std }) {
       <div className="side-stat-label">{label}</div>
       <div className="side-stat-value">
         {value ?? "—"}
-        <span className="bt-unit"> {unit}</span>
-        {std && <span className="bt-std"> ± {std}</span>}
+        <span className="side-unit"> {unit}</span>
+        {std && <span className="side-std"> ± {std}</span>}
       </div>
     </div>
   );
 }
 
-function SpeedZonesTab({ session }) {
+function SpeedZonesTab({ session, insights }) {
   if (!session) return null;
-
   return (
     <>
-      <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "1rem", lineHeight: 1.5 }}>
-        How mechanics change across speed zones — revealing the relationship between pace and biomechanical output.
-      </p>
-      <div className="card">
+      <InsightStack insights={insights} />
+      <div className="card" style={{ marginTop: "1rem" }}>
         <SpeedZonesTable zones={session.speed_zones} />
       </div>
+    </>
+  );
+}
 
-      {session.speed_zones?.length > 1 && (
-        <div className="insight-box" style={{ marginTop: "1rem" }}>
-          <strong>Speed-Mechanics Pattern:</strong> As speed increases, expect GCT to shorten,
-          forces to increase, and foot strike angle to shift forward. The rate of these changes
-          reveals individual mechanical signatures — how efficiently the body scales movement
-          with speed demands.
+function FatigueTab({ session, insights }) {
+  if (!session) return null;
+  return (
+    <>
+      <InsightStack insights={insights} />
+      <div className="section-label" style={{ marginTop: "1rem" }}>Fatigue Detection</div>
+      <div className="card">
+        <FatiguePanel fatigue={session.fatigue} />
+      </div>
+      {session.time_series && (
+        <div style={{ marginTop: "1.5rem" }}>
+          <div className="section-label">Session Timeline</div>
+          <div className="card">
+            <SessionChart timeSeries={session.time_series} metrics={["speed", "gct"]} height={240} />
+          </div>
         </div>
       )}
     </>
   );
 }
 
-function FatigueTab({ session }) {
-  if (!session) return null;
+function TrendsTab({ sessions, insights }) {
+  if (!sessions || sessions.length < 2)
+    return <p style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Need 2+ sessions for trend analysis.</p>;
 
   return (
     <>
-      <div className="section-title">Within-Session Fatigue Detection</div>
-      <div className="card">
-        <FatiguePanel fatigue={session.fatigue} />
-      </div>
-
-      <div style={{ marginTop: "1.5rem" }}>
-        <div className="section-title">Full Session Timeline</div>
+      <InsightStack insights={insights} />
+      <div className="trends-grid" style={{ marginTop: "1rem" }}>
         <div className="card">
-          <SessionChart
-            timeSeries={session.time_series}
-            metrics={["speed", "gct"]}
-            height={260}
-          />
-          <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "0.5rem", lineHeight: 1.5 }}>
-            Watch for GCT creeping upward while speed holds steady — the signature of neuromuscular fatigue.
-          </div>
+          <TrendChart sessions={sessions} metricPath="metrics.avg_speed_mps" label="Avg Speed (m/s)" color="var(--accent)" unit=" m/s" />
+        </div>
+        <div className="card">
+          <TrendChart sessions={sessions} metricPath="metrics.avg_gct_ms" label="Avg GCT (ms)" color="var(--green)" unit=" ms" />
+        </div>
+        <div className="card">
+          <TrendChart sessions={sessions} metricPath="metrics.avg_stride_len_m" label="Stride Length (m)" color="#22d3ee" unit=" m" />
+        </div>
+        <div className="card">
+          <TrendChart sessions={sessions} metricPath="metrics.avg_vgrf_peak_bw" label="Peak vGRF (BW)" color="var(--amber)" unit=" BW" />
+        </div>
+        <div className="card">
+          <TrendChart sessions={sessions} metricPath="asymmetry.gct_ms" label="GCT Asymmetry L-R (ms)" color="var(--red)" unit=" ms" />
+        </div>
+        <div className="card">
+          <TrendChart sessions={sessions} metricPath="metrics.avg_cadence_spm" label="Cadence (spm)" color="#a78bfa" unit=" spm" />
         </div>
       </div>
     </>
-  );
-}
-
-function TrendsTab({ sessions }) {
-  if (!sessions || sessions.length < 2) {
-    return <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Need 2+ sessions for trend analysis.</p>;
-  }
-
-  return (
-    <div className="trends-grid">
-      <div className="card">
-        <TrendChart sessions={sessions} metricPath="metrics.avg_speed_mps" label="Avg Speed (m/s)" color="#6366f1" unit=" m/s" />
-      </div>
-      <div className="card">
-        <TrendChart sessions={sessions} metricPath="metrics.avg_gct_ms" label="Avg GCT (ms)" color="#22c55e" unit=" ms" />
-      </div>
-      <div className="card">
-        <TrendChart sessions={sessions} metricPath="metrics.avg_stride_len_m" label="Stride Length (m)" color="#06b6d4" unit=" m" />
-      </div>
-      <div className="card">
-        <TrendChart sessions={sessions} metricPath="metrics.avg_vgrf_peak_bw" label="Peak vGRF (BW)" color="#f59e0b" unit=" BW" />
-      </div>
-      <div className="card">
-        <TrendChart sessions={sessions} metricPath="asymmetry.gct_ms" label="GCT Asymmetry L-R (ms)" color="#ef4444" unit=" ms" />
-      </div>
-      <div className="card">
-        <TrendChart sessions={sessions} metricPath="metrics.avg_cadence_spm" label="Cadence (spm)" color="#8b5cf6" unit=" spm" />
-      </div>
-    </div>
   );
 }

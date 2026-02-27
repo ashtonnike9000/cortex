@@ -6,50 +6,53 @@
 .bilateral-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .bilateral-table th {
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.6rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   padding: 0.6rem 0.75rem;
   text-align: left;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
 
 .bilateral-table td {
   padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-subtle);
   white-space: nowrap;
+  color: var(--text-secondary);
 }
 
 .bt-label {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
 .bt-std {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
 }
 
 .bt-unit {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
 }
 
 .bt-diff {
-  font-family: "Inter", monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .bt-badge {
   display: inline-block;
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }

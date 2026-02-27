@@ -9,7 +9,7 @@ export default function MetricCard({ label, value, unit, trend, color }) {
         {unit && <span className="unit">{unit}</span>}
       </div>
       {trend != null && (
-        <div style={{ fontSize: "0.7rem", color: trendColor, marginTop: "0.15rem" }}>
+        <div style={{ fontSize: "0.65rem", fontWeight: 700, color: trendColor, marginTop: "0.15rem" }}>
           {trend > 0 ? "+" : ""}
           {trend}%
         </div>

@@ -5,7 +5,7 @@
 .tabs-nav {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -17,14 +17,16 @@
 
 .tab-btn {
   flex-shrink: 0;
-  padding: 0.6rem 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  margin-bottom: -1px;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -37,16 +39,15 @@
 .tab-btn.active {
   color: var(--accent);
   border-bottom-color: var(--accent);
-  font-weight: 600;
 }
 
 .tab-content {
-  padding-top: 1.25rem;
+  padding-top: 1.5rem;
 }
 
 @media (max-width: 640px) {
   .tab-btn {
     padding: 0.5rem 0.75rem;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 }

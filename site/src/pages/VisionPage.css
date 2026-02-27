@@ -1,0 +1,193 @@
+.vision-page {
+  padding-bottom: 4rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Hero */
+.vision-hero {
+  padding: 4rem 0 3rem;
+  text-align: center;
+  position: relative;
+}
+
+.vision-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.vision-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.vision-kicker {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.vision-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.vision-accent {
+  color: var(--accent);
+}
+
+.vision-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 550px;
+  margin: 1.5rem auto 0;
+}
+
+/* Content sections */
+.vision-content {
+  padding: 0;
+}
+
+.vision-section {
+  padding: 2rem 0;
+}
+
+.vision-era {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.era-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+.era-badge.current {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.era-badge.near {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--cyan);
+}
+
+.era-badge.future {
+  background: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+}
+
+.era-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.vision-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+/* Vision points */
+.vision-points {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.vision-point {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.vp-marker {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 0.55rem;
+}
+
+.vp-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.3rem;
+}
+
+.vp-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Divider */
+.vision-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.5rem 0;
+}
+
+/* Coda */
+.vision-coda {
+  text-align: center;
+  padding: 3rem 0 1rem;
+}
+
+.coda-text {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.coda-text strong {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .vision-title {
+    font-size: 2.25rem;
+  }
+
+  .vision-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .era-title {
+    font-size: 1.2rem;
+  }
+
+  .vision-hero {
+    padding: 2.5rem 0 2rem;
+  }
+}

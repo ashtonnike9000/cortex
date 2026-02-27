@@ -51,7 +51,7 @@ export default function FatiguePanel({ fatigue }) {
 
       {(fatigue.left_gct || fatigue.right_gct) && (
         <div style={{ marginTop: "1rem" }}>
-          <div className="section-title">Per-Side GCT Drift</div>
+          <div className="section-label">Per-Side GCT Drift</div>
           <div className="drift-grid">
             <DriftCard label="Left GCT" data={fatigue.left_gct} unit="ms" />
             <DriftCard label="Right GCT" data={fatigue.right_gct} unit="ms" />

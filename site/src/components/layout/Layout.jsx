@@ -1,22 +1,21 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import "./Layout.css";
 
 export default function Layout({ children }) {
-  const location = useLocation();
-  const isHome = location.pathname === "/";
-
   return (
     <div className="layout">
       <header className="topbar">
         <Link to="/" className="logo">
-          <span className="logo-mark">C</span>
-          <span className="logo-text">Cortex</span>
+          <span className="logo-text">CORTEX</span>
         </Link>
-        {!isHome && (
-          <Link to="/" className="back-link">
+        <nav className="nav-links">
+          <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`} end>
             Dashboard
-          </Link>
-        )}
+          </NavLink>
+          <NavLink to="/vision" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+            Vision
+          </NavLink>
+        </nav>
       </header>
       <main className="content">{children}</main>
     </div>
