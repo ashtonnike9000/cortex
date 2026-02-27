@@ -1,0 +1,55 @@
+.bilateral-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bilateral-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.bilateral-table th {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.bilateral-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.bt-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.bt-std {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.bt-unit {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.bt-diff {
+  font-family: "Inter", monospace;
+}
+
+.bt-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
