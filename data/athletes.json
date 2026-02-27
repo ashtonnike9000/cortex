@@ -1,0 +1,18 @@
+{
+  "athletes": [
+    {
+      "id": "4ace5dbb-1263-4f04-a111-4e1d1be5074a",
+      "name": "Ashton",
+      "folder": "ashton",
+      "data_source": "nucleus",
+      "sport": "running"
+    },
+    {
+      "id": "ad577366-602b-488f-add9-17a93354522f",
+      "name": "Carrie",
+      "folder": "carrie",
+      "data_source": "garmin",
+      "sport": "running"
+    }
+  ]
+}

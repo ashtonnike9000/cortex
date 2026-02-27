@@ -1,0 +1,172 @@
+.dashboard {
+  padding-bottom: 3rem;
+}
+
+.dash-header {
+  margin-bottom: 1.5rem;
+}
+
+.dash-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.dash-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.overview-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.overview-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  text-align: center;
+}
+
+.overview-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.overview-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.athlete-cards {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.athlete-card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.athlete-card:hover {
+  text-decoration: none;
+}
+
+.ac-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.ac-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.ac-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ac-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ac-meta {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.ac-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.mini-metric {
+  text-align: center;
+}
+
+.mm-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.1rem;
+}
+
+.mm-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mm-unit {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 1px;
+}
+
+.ac-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.ac-dates {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.ac-arrow {
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.dash-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .dash-title {
+    font-size: 1.35rem;
+  }
+
+  .overview-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .ac-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
