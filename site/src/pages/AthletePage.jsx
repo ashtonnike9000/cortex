@@ -371,95 +371,115 @@ function FatigueProfile({ athlete }) {
 // SESSION CALENDAR — visual date picker
 // ==========================================================================
 
-function SessionShoeTag({ session }) {
+function SessionShoePicker({ session }) {
   const { assign, getShoe } = useContext(ShoeCtx);
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const currentShoe = getShoe(session);
   const shoe = currentShoe ? SHOES[currentShoe] : null;
-
-  useEffect(() => {
-    if (!open) return;
-    const handleClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
 
   const allShoes = Object.values(SHOES);
   const everyday = allShoes.filter((s) => s.category === "everyday");
   const racing = allShoes.filter((s) => s.category === "racing");
 
   return (
-    <div className="session-shoe-tag" ref={dropdownRef}>
-      <button className={`sst-btn ${shoe ? "sst-assigned" : ""}`} onClick={() => setOpen(!open)}>
-        <span className="sst-shoe-icon">👟</span>
-        {shoe ? (
-          <>
-            <span className="sst-shoe-name">{shoe.name}</span>
-            <span className="sst-shoe-spec">{shoe.weight_g}g · {shoe.drop_mm}mm</span>
-          </>
-        ) : (
-          <span className="sst-placeholder">What shoe was this?</span>
-        )}
-        <span className="sst-chevron">{open ? "▴" : "▾"}</span>
-      </button>
-      {open && (
-        <div className="sst-dropdown">
-          <div className="sst-dd-header">Select Shoe for This Session</div>
-          <button className="sst-option sst-none" onClick={() => { assign(session, null); setOpen(false); }}>
-            Clear selection
-          </button>
-          <div className="sst-group-label">Everyday</div>
-          <div className="sst-grid">
-            {everyday.map((s) => {
-              const hasPlate = !!s.plate?.includes("carbon");
-              return (
-                <button
-                  key={s.id}
-                  className={`sst-card ${currentShoe === s.id ? "sst-card-active" : ""}`}
-                  onClick={() => { assign(session, s.id); setOpen(false); }}
-                >
-                  <div className="sst-card-name">{s.name}</div>
-                  <div className="sst-card-specs">
-                    <span>{s.weight_g}g</span>
-                    <span>{s.drop_mm}mm drop</span>
-                    {hasPlate && <span className="sst-card-plate">C</span>}
-                  </div>
-                </button>
-              );
-            })}
+    <>
+      <div className={`shoe-picker-block ${shoe ? "spb-assigned" : ""}`} onClick={() => setOpen(true)}>
+        <div className="spb-left">
+          <span className="spb-icon">👟</span>
+          <div className="spb-content">
+            {shoe ? (
+              <>
+                <div className="spb-shoe-name">{shoe.name}</div>
+                <div className="spb-shoe-detail">{shoe.weight_g}g · {shoe.stack_heel_mm}/{shoe.stack_forefoot_mm}mm · {shoe.drop_mm}mm drop{shoe.plate?.includes("carbon") ? " · Carbon" : ""}</div>
+              </>
+            ) : (
+              <>
+                <div className="spb-cta">What shoe was this run in?</div>
+                <div className="spb-cta-sub">Tap to assign — enables footwear performance comparison</div>
+              </>
+            )}
           </div>
-          <div className="sst-group-label">Racing</div>
-          <div className="sst-grid">
-            {racing.map((s) => {
-              const hasPlate = !!s.plate?.includes("carbon");
-              return (
-                <button
-                  key={s.id}
-                  className={`sst-card sst-card-racing ${currentShoe === s.id ? "sst-card-active" : ""}`}
-                  onClick={() => { assign(session, s.id); setOpen(false); }}
-                >
-                  <div className="sst-card-name">{s.name}</div>
-                  <div className="sst-card-specs">
-                    <span>{s.weight_g}g</span>
-                    <span>{s.drop_mm}mm</span>
-                    {hasPlate && <span className="sst-card-plate">C</span>}
-                  </div>
-                </button>
-              );
-            })}
+        </div>
+        <span className="spb-arrow">→</span>
+      </div>
+
+      {open && (
+        <div className="shoe-modal-overlay" onClick={() => setOpen(false)}>
+          <div className="shoe-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="sm-header">
+              <h3 className="sm-title">Select Shoe</h3>
+              <div className="sm-session-info">{session.date} · {session.distance_mi?.toFixed(2)} mi</div>
+              <button className="sm-close" onClick={() => setOpen(false)}>✕</button>
+            </div>
+
+            {shoe && (
+              <button className="sm-clear" onClick={() => { assign(session, null); setOpen(false); }}>
+                Clear shoe assignment
+              </button>
+            )}
+
+            <div className="sm-section">
+              <div className="sm-section-label">Everyday</div>
+              <div className="sm-grid">
+                {everyday.map((s) => {
+                  const hasPlate = !!s.plate?.includes("carbon");
+                  const isActive = currentShoe === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      className={`sm-card ${isActive ? "sm-card-active" : ""}`}
+                      onClick={() => { assign(session, s.id); setOpen(false); }}
+                    >
+                      <div className="smc-name">{s.name}</div>
+                      <div className="smc-foam">{s.foam_type?.split(" ")[0] || s.foam?.split(" ")[0]}</div>
+                      <div className="smc-specs">
+                        <span className="smc-weight">{s.weight_g}g</span>
+                        <span>{s.drop_mm}mm</span>
+                        {hasPlate && <span className="smc-plate">Carbon</span>}
+                      </div>
+                      <div className="smc-price">${s.price_usd}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="sm-section">
+              <div className="sm-section-label">Road Racing</div>
+              <div className="sm-grid">
+                {racing.map((s) => {
+                  const hasPlate = !!s.plate?.includes("carbon");
+                  const isActive = currentShoe === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      className={`sm-card sm-card-racing ${isActive ? "sm-card-active" : ""}`}
+                      onClick={() => { assign(session, s.id); setOpen(false); }}
+                    >
+                      <div className="smc-name">{s.name}</div>
+                      <div className="smc-foam">ZoomX</div>
+                      <div className="smc-specs">
+                        <span className="smc-weight">{s.weight_g}g</span>
+                        <span>{s.drop_mm}mm</span>
+                        {hasPlate && <span className="smc-plate">Carbon</span>}
+                      </div>
+                      <div className="smc-price">${s.price_usd}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
 
 function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRunOnly, session, pace, speed, unit }) {
   const calRef = useRef(null);
+  const { getShoe } = useContext(ShoeCtx);
 
   const sessionsByDate = useMemo(() => {
     const map = {};
@@ -540,17 +560,19 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
                   const hasSession = !!sessionIdxs;
                   const isSelected = dateStr === selectedDate;
                   const isToday = dateStr === today;
+                  const hasShoe = hasSession && sessionIdxs.some((idx) => getShoe(sessions[idx]));
+                  const noShoe = hasSession && !hasShoe;
 
                   return (
                     <button
                       key={i}
-                      className={`cal-cell ${hasSession ? "cal-has-session" : ""} ${isSelected ? "cal-selected" : ""} ${isToday ? "cal-today" : ""}`}
+                      className={`cal-cell ${hasSession ? "cal-has-session" : ""} ${isSelected ? "cal-selected" : ""} ${isToday ? "cal-today" : ""} ${hasShoe ? "cal-has-shoe" : ""} ${noShoe ? "cal-no-shoe" : ""}`}
                       disabled={!hasSession}
                       onClick={() => hasSession && onSelect(sessionIdxs[sessionIdxs.length - 1])}
-                      title={hasSession ? `${sessionIdxs.length} session${sessionIdxs.length > 1 ? "s" : ""}` : ""}
+                      title={hasSession ? `${sessionIdxs.length} session${sessionIdxs.length > 1 ? "s" : ""}${hasShoe ? " · shoe tagged" : " · no shoe"}` : ""}
                     >
                       {day}
-                      {hasSession && <span className="cal-dot" />}
+                      {hasSession && <span className={`cal-dot ${hasShoe ? "cal-dot-shoe" : ""}`} />}
                       {sessionIdxs?.length > 1 && <span className="cal-multi">{sessionIdxs.length}</span>}
                     </button>
                   );
@@ -593,9 +615,9 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
             <span className="sps-filtered">{session.n_filtered_out} filtered</span>
           </>
         )}
-        <span className="sps-sep">·</span>
-        <SessionShoeTag session={session} />
       </div>
+
+      <SessionShoePicker session={session} />
     </div>
   );
 }
