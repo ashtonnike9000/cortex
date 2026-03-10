@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef, createContext, useContext } from "react";
+import { createPortal } from "react-dom";
 import { useParams, Link } from "react-router-dom";
 import { fetchAthlete } from "../api";
 import InteractiveSessionChart from "../components/charts/InteractiveSessionChart";
@@ -403,7 +404,7 @@ function SessionShoePicker({ session }) {
         <span className="spb-arrow">→</span>
       </div>
 
-      {open && (
+      {open && createPortal(
         <div className="shoe-modal-overlay" onClick={() => setOpen(false)}>
           <div className="shoe-modal" onClick={(e) => e.stopPropagation()}>
             <div className="sm-header">
@@ -470,7 +471,8 @@ function SessionShoePicker({ session }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
