@@ -6,7 +6,7 @@ const ATHLETE = {
   name: "Athlete K",
   event: "800m",
   pb: "1:56.8",
-  targetPace: "~42s per 500m (race pace)",
+  targetPace: "~70s per 500m (race pace)",
   age: 24,
   weight_kg: 54,
 };
@@ -58,39 +58,39 @@ const PRE_SESSION = {
 
 const REPS = [
   {
-    rep: 1, time: "41.8s", avg_hr: 176, peak_hr: 182, recovery_hr: 128,
+    rep: 1, time: "69.2s", avg_hr: 176, peak_hr: 182, recovery_hr: 128,
     avg_gct_ms: 186, avg_cadence: 208, avg_stride_m: 2.18, avg_vgrf_bw: 2.71,
     avg_fsa_deg: 8.2, asymmetry_gct_pct: 1.4, loading_rate: 48.2,
     gct_first_100m: 183, gct_last_100m: 188,
-    notes: "Clean opener. Mechanics crisp. GCT flat through the rep. HR rises appropriately.",
+    notes: "Clean opener. Coming through 400 in ~55.4. Mechanics crisp. GCT flat through the rep. HR rises appropriately.",
   },
   {
-    rep: 2, time: "42.1s", avg_hr: 179, peak_hr: 186, recovery_hr: 134,
+    rep: 2, time: "69.8s", avg_hr: 179, peak_hr: 186, recovery_hr: 134,
     avg_gct_ms: 188, avg_cadence: 206, avg_stride_m: 2.16, avg_vgrf_bw: 2.74,
     avg_fsa_deg: 8.5, asymmetry_gct_pct: 1.8, loading_rate: 49.1,
     gct_first_100m: 185, gct_last_100m: 191,
     notes: "Marginally slower. GCT up 2ms — within noise. HR recovery between reps was 3:22. Slight FSA increase suggests minor foot-strike shift.",
   },
   {
-    rep: 3, time: "42.4s", avg_hr: 183, peak_hr: 189, recovery_hr: 139,
+    rep: 3, time: "70.6s", avg_hr: 183, peak_hr: 189, recovery_hr: 139,
     avg_gct_ms: 191, avg_cadence: 204, avg_stride_m: 2.14, avg_vgrf_bw: 2.78,
     avg_fsa_deg: 9.1, asymmetry_gct_pct: 2.6, loading_rate: 50.8,
     gct_first_100m: 187, gct_last_100m: 196,
-    notes: "First signs of fatigue. GCT now +5ms from Rep 1. Cadence dropping — stride shortening to compensate. Recovery HR not fully coming down (139 vs 128). Asymmetry creeping up.",
+    notes: "First signs of fatigue. GCT now +5ms from Rep 1. Cadence dropping — stride shortening to compensate. Recovery HR not fully coming down (139 vs 128). Asymmetry creeping up. Through 400 in ~56.5.",
   },
   {
-    rep: 4, time: "43.0s", avg_hr: 186, peak_hr: 192, recovery_hr: 144,
+    rep: 4, time: "71.4s", avg_hr: 186, peak_hr: 192, recovery_hr: 144,
     avg_gct_ms: 195, avg_cadence: 201, avg_stride_m: 2.11, avg_vgrf_bw: 2.82,
     avg_fsa_deg: 9.8, asymmetry_gct_pct: 3.9, loading_rate: 53.1,
     gct_first_100m: 190, gct_last_100m: 202,
     notes: "Clear fatigue pattern. GCT +9ms from Rep 1. Stride shortened 7cm. Asymmetry nearly tripled. Recovery HR barely dropping between reps. Loading rate increasing — she's landing harder as form degrades.",
   },
   {
-    rep: 5, time: "43.6s", avg_hr: 189, peak_hr: 194, recovery_hr: null,
+    rep: 5, time: "72.3s", avg_hr: 189, peak_hr: 194, recovery_hr: null,
     avg_gct_ms: 199, avg_cadence: 198, avg_stride_m: 2.08, avg_vgrf_bw: 2.86,
     avg_fsa_deg: 10.4, asymmetry_gct_pct: 5.2, loading_rate: 55.7,
     gct_first_100m: 193, gct_last_100m: 208,
-    notes: "Full mechanical degradation. GCT +13ms from Rep 1 (7% drift). Cadence dropped 10spm. Asymmetry at 5.2% — left side fatiguing faster. Last 100m GCT (208ms) is 25ms above first 100m of Rep 1. Time 1.8s slower than opener.",
+    notes: "Full mechanical degradation. GCT +13ms from Rep 1 (7% drift). Cadence dropped 10spm. Asymmetry at 5.2% — left side fatiguing faster. Last 100m GCT (208ms) is 25ms above first 100m of Rep 1. Through 400 in ~57.8 — 2.4s slower than opener.",
   },
 ];
 
@@ -265,6 +265,9 @@ export default function SessionLabPage() {
           </table>
         </div>
 
+        {/* Rep-by-rep chart */}
+        <RepChart reps={REPS} />
+
         {/* Rep detail cards */}
         <div className="rep-cards">
           {REPS.map((r) => (
@@ -332,7 +335,7 @@ export default function SessionLabPage() {
             items={[
               "Reps 1-3 were productive. Reps 4-5 showed enough degradation that 6 reps would have been counterproductive.",
               "The asymmetry pattern post-lift day is new information — adjust S&C timing relative to quality sessions.",
-              "Recovery HR decay rate can predict race-day fatigue onset: she'll start struggling around 500m.",
+              "Recovery HR decay rate can predict race-day fatigue onset: she'll start struggling around the third 200m.",
               "Sharpening block is working — Rep 1 mechanics are sharper than same session 4 weeks ago.",
               "Her fatigue onset is muscular, not cardiovascular. Training implication: more strength endurance, not more intervals.",
             ]}
@@ -415,6 +418,106 @@ export default function SessionLabPage() {
           the intelligence lives.
         </p>
       </div>
+    </div>
+  );
+}
+
+
+/* ── Rep Chart ── */
+
+const CHART_METRICS = [
+  { key: "avg_gct_ms", label: "GCT (ms)", color: "#30d158", unit: "ms" },
+  { key: "avg_hr", label: "Avg HR", color: "#ff453a", unit: "bpm" },
+  { key: "avg_cadence", label: "Cadence", color: "#ffd60a", unit: "spm" },
+  { key: "asymmetry_gct_pct", label: "Asymmetry", color: "#ff9f0a", unit: "%" },
+  { key: "loading_rate", label: "Load Rate", color: "#64d2ff", unit: "BW/s" },
+];
+
+function RepChart({ reps }) {
+  const W = 600, H = 260, PAD_L = 48, PAD_R = 16, PAD_T = 24, PAD_B = 36;
+  const plotW = W - PAD_L - PAD_R;
+  const plotH = H - PAD_T - PAD_B;
+
+  return (
+    <div className="rep-chart-section">
+      <h3 className="rep-chart-title">Rep-by-Rep Progression</h3>
+      <div className="rep-chart-legend">
+        {CHART_METRICS.map((m) => (
+          <span key={m.key} className="rcl-item">
+            <span className="rcl-dot" style={{ background: m.color }} />
+            {m.label}
+          </span>
+        ))}
+      </div>
+      <div className="rep-chart-wrap">
+        <svg viewBox={`0 0 ${W} ${H}`} className="rep-chart-svg">
+          {/* Grid lines */}
+          {[0, 0.25, 0.5, 0.75, 1].map((pct) => {
+            const y = PAD_T + plotH * (1 - pct);
+            return (
+              <line key={pct} x1={PAD_L} y1={y} x2={W - PAD_R} y2={y}
+                stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+            );
+          })}
+
+          {/* Rep labels */}
+          {reps.map((r, i) => {
+            const x = PAD_L + (i / (reps.length - 1)) * plotW;
+            return (
+              <text key={i} x={x} y={H - 8} textAnchor="middle"
+                fontSize="11" fill="#8e8e93" fontFamily="Inter, sans-serif" fontWeight="600">
+                Rep {r.rep}
+              </text>
+            );
+          })}
+
+          {/* Lines for each metric (normalized to 0-1 range) */}
+          {CHART_METRICS.map((m) => {
+            const vals = reps.map((r) => r[m.key]);
+            const min = Math.min(...vals);
+            const max = Math.max(...vals);
+            const range = max - min || 1;
+
+            const points = reps.map((r, i) => {
+              const x = PAD_L + (i / (reps.length - 1)) * plotW;
+              const y = PAD_T + plotH - ((r[m.key] - min) / range) * plotH;
+              return `${x},${y}`;
+            });
+
+            const dotPoints = reps.map((r, i) => ({
+              x: PAD_L + (i / (reps.length - 1)) * plotW,
+              y: PAD_T + plotH - ((r[m.key] - min) / range) * plotH,
+              val: r[m.key],
+            }));
+
+            return (
+              <g key={m.key}>
+                <polyline
+                  points={points.join(" ")}
+                  fill="none"
+                  stroke={m.color}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {dotPoints.map((p, i) => (
+                  <g key={i}>
+                    <circle cx={p.x} cy={p.y} r="4" fill={m.color} />
+                    <text x={p.x} y={p.y - 8} textAnchor="middle"
+                      fontSize="9" fill={m.color} fontFamily="Inter, sans-serif" fontWeight="700">
+                      {m.key === "asymmetry_gct_pct" ? `${p.val}%` : p.val}
+                    </text>
+                  </g>
+                ))}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <p className="rep-chart-note">
+        Each metric is independently scaled to show its own progression. 
+        All lines trending upward indicate increasing fatigue load.
+      </p>
     </div>
   );
 }
