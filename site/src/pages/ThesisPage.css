@@ -1,0 +1,745 @@
+.thesis-page {
+  padding-bottom: 4rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+
+.thesis-hero {
+  padding: 5rem 0 3rem;
+  text-align: center;
+  position: relative;
+}
+
+.thesis-hero::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.thesis-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.thesis-kicker {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+.thesis-title {
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  color: var(--text-primary);
+}
+
+.thesis-accent {
+  color: var(--accent);
+}
+
+.thesis-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 600px;
+  margin: 1.75rem auto 0;
+}
+
+/* ── Sections ────────────────────────────────────────── */
+
+.thesis-section {
+  padding: 2.5rem 0;
+}
+
+.thesis-section-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.thesis-section-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.thesis-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.thesis-text em {
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+.thesis-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.5rem 0;
+}
+
+/* ── Credo ────────────────────────────────────────────── */
+
+.credo-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 2rem 0;
+}
+
+.credo-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 90px;
+}
+
+.credo-number {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--accent);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.credo-word {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.credo-desc {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.credo-arrow {
+  width: 32px;
+  height: 2px;
+  background: var(--border);
+  flex-shrink: 0;
+  position: relative;
+  margin: 0 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.credo-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -3px;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid var(--border);
+}
+
+.credo-caption {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Landscape cards ─────────────────────────────────── */
+
+.landscape-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.landscape-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s;
+}
+
+.landscape-card.highlighted {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(205, 255, 0, 0.03) 0%, var(--bg-card) 100%);
+}
+
+.lc-header {
+  margin-bottom: 0.75rem;
+}
+
+.lc-name {
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.lc-covers {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.lc-covers.accent {
+  color: var(--accent);
+}
+
+.lc-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+}
+
+.lc-limit {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle);
+  font-style: italic;
+}
+
+/* ── System Flow ─────────────────────────────────────── */
+
+.system-flow {
+  margin-top: 2rem;
+}
+
+.flow-layer {
+  padding: 1.25rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}
+
+.flow-layer-fusion {
+  background: linear-gradient(135deg, rgba(205, 255, 0, 0.02) 0%, var(--bg-card) 100%);
+  border-color: rgba(205, 255, 0, 0.12);
+}
+
+.flow-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.flow-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.chip-gait {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.chip-cardio {
+  background: var(--red-dim);
+  color: var(--red);
+}
+
+.chip-spatial {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--cyan);
+}
+
+.chip-visual {
+  background: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+}
+
+.chip-subjective {
+  background: var(--amber-dim);
+  color: var(--amber);
+}
+
+.chip-lab {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+.flow-connector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+}
+
+.flow-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.flow-connector-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Fusion rules ────────────────────────────────────── */
+
+.fusion-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fusion-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.fusion-signals {
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.68rem;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fusion-arrow {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.fusion-meaning {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Output cards ────────────────────────────────────── */
+
+.output-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.output-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.oc-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 900;
+  margin-bottom: 0.75rem;
+}
+
+.oc-audience {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.oc-headline {
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.oc-items {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.oc-item {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 0.85rem;
+  position: relative;
+}
+
+.oc-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* ── Differentiator cards ────────────────────────────── */
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.diff-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.diff-title {
+  font-size: 0.88rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.diff-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ── Translation example ─────────────────────────────── */
+
+.translation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.translation-card {
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.translation-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.translation-athlete {
+  background: var(--bg-card);
+}
+
+.translation-athlete::before {
+  background: var(--accent);
+}
+
+.translation-product {
+  background: var(--bg-card);
+}
+
+.translation-product::before {
+  background: var(--cyan);
+}
+
+.translation-header {
+  margin-bottom: 0.75rem;
+}
+
+.translation-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.translation-badge.athlete {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.translation-badge.product {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--cyan);
+}
+
+.translation-body {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* ── Evolution timeline ──────────────────────────────── */
+
+.evolution-timeline {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.evo-phase {
+  display: flex;
+  gap: 1rem;
+}
+
+.evo-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 16px;
+}
+
+.evo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.evo-complete .evo-dot {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(205, 255, 0, 0.3);
+}
+
+.evo-active .evo-dot {
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(205, 255, 0, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(205, 255, 0, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(205, 255, 0, 0.5); }
+}
+
+.evo-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border);
+  min-height: 2rem;
+}
+
+.evo-phase:last-child .evo-line {
+  display: none;
+}
+
+.evo-content {
+  padding-bottom: 1.5rem;
+}
+
+.evo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.35rem;
+}
+
+.evo-badge.complete {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.evo-badge.active {
+  background: var(--accent-medium);
+  color: var(--accent);
+}
+
+.evo-badge.planned {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+}
+
+.evo-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.3rem;
+}
+
+.evo-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ── Coda ─────────────────────────────────────────────── */
+
+.thesis-coda {
+  text-align: center;
+  padding: 4rem 0 2rem;
+}
+
+.coda-line {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 2;
+  margin-bottom: 1.5rem;
+}
+
+.coda-line strong {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.coda-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  max-width: 550px;
+  margin: 0 auto 2rem;
+}
+
+.coda-final {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 740px) {
+  .thesis-title {
+    font-size: 2.75rem;
+  }
+
+  .thesis-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .thesis-section-title {
+    font-size: 1.35rem;
+  }
+
+  .landscape-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .output-grid,
+  .diff-grid,
+  .translation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .credo-strip {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .credo-arrow {
+    width: 20px;
+  }
+
+  .credo-step {
+    min-width: 70px;
+  }
+
+  .credo-word {
+    font-size: 1.1rem;
+  }
+
+  .fusion-rule {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .fusion-arrow {
+    display: none;
+  }
+
+  .fusion-meaning {
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--border);
+  }
+
+  .thesis-hero {
+    padding: 3rem 0 2rem;
+  }
+
+  .coda-final {
+    font-size: 1.35rem;
+  }
+}

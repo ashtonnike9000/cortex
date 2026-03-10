@@ -3,7 +3,7 @@ import {
   CartesianGrid, Tooltip,
 } from "recharts";
 
-export default function TrendChart({ sessions, metricPath, label, color = "#CDFF00", unit = "", height = 190 }) {
+export default function TrendChart({ sessions, metricPath, label, color = "#CDFF00", unit = "", height = 190, transform }) {
   if (!sessions || sessions.length < 2) return null;
 
   const data = sessions
@@ -15,6 +15,7 @@ export default function TrendChart({ sessions, metricPath, label, color = "#CDFF
     .map((s) => {
       let val = s;
       for (const p of metricPath.split(".")) val = val?.[p];
+      if (transform) val = transform(val);
       return { date: s.date, value: Math.round(val * 100) / 100 };
     });
 

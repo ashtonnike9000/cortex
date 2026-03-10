@@ -3,15 +3,35 @@
     {
       "id": "4ace5dbb-1263-4f04-a111-4e1d1be5074a",
       "name": "Ashton",
-      "folder": "ashton",
-      "data_source": "nucleus",
+      "sources": [
+        { "folder": "ashton", "type": "nucleus", "label": "Garmin" },
+        { "folder": "Ashton 1", "type": "nucleus_flat", "label": "Nucleus", "activity_types": ["Run", "Sprint"] }
+      ],
       "sport": "running"
     },
     {
       "id": "ad577366-602b-488f-add9-17a93354522f",
       "name": "Carrie",
-      "folder": "carrie",
-      "data_source": "garmin",
+      "sources": [
+        { "folder": "carrie", "type": "garmin", "label": "Garmin" },
+        { "folder": "Carrie 1", "type": "nucleus_flat", "label": "Nucleus", "activity_types": ["Run"] }
+      ],
+      "sport": "running"
+    },
+    {
+      "id": "c8631a49-0638-4f1b-ae77-581cc124af8b",
+      "name": "Bobby",
+      "sources": [
+        { "folder": "Bobby", "type": "nucleus_flat", "label": "Nucleus", "activity_types": ["Run"] }
+      ],
+      "sport": "running"
+    },
+    {
+      "id": "3c37a601-fa5b-4a78-bb0f-d144001ec5b7",
+      "name": "Jordan",
+      "sources": [
+        { "folder": "Jordan", "type": "nucleus_flat", "label": "Nucleus", "activity_types": ["Run"] }
+      ],
       "sport": "running"
     }
   ]

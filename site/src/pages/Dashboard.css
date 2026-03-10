@@ -3,7 +3,7 @@
 }
 
 .dash-hero {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .dash-title {
@@ -22,21 +22,25 @@
   margin-top: 0.5rem;
 }
 
-/* Fleet stats */
-.fleet-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+/* Fleet bar */
+.fleet-bar {
+  display: flex;
   gap: 0.5rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
 }
 
 .fleet-stat {
   background: var(--bg-card);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  padding: 0.85rem 1.25rem;
+  min-width: 120px;
+  flex: 1;
 }
 
 .fleet-stat-value {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -44,90 +48,99 @@
 }
 
 .fleet-stat-unit {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-left: 3px;
 }
 
 .fleet-stat-label {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
-  margin-top: 0.4rem;
+  margin-top: 0.35rem;
 }
 
-/* Athlete table */
-.table-wrap {
-  overflow-x: auto;
-  padding: 0;
+
+/* Sections */
+.dash-section {
+  margin-bottom: 2rem;
 }
 
-.athlete-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.75rem;
-}
-
-.athlete-table th {
-  text-align: left;
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  padding: 0.75rem 0.85rem;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-  user-select: none;
-}
-
-.athlete-table th.sortable {
-  cursor: pointer;
-}
-
-.athlete-table th.sortable:hover {
-  color: var(--accent);
-}
-
-.sort-arrow {
-  font-size: 0.5rem;
-  color: var(--accent);
-}
-
-.athlete-table td {
-  padding: 0.7rem 0.85rem;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.athlete-table tbody tr:hover {
-  background: var(--bg-card-hover);
-}
-
-.athlete-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.athlete-link {
+.dash-section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-primary);
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.75rem;
 }
 
-.athlete-link:hover {
-  color: var(--accent);
+.dash-section-count {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.attention-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+
+.ok-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+
+/* Athlete cards */
+.athlete-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 0.5rem;
+}
+
+.athlete-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.athlete-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border);
+  color: inherit;
   text-decoration: none;
 }
 
-.at-avatar {
-  width: 28px;
-  height: 28px;
+.ac-top {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.ac-avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--accent-dim);
   color: var(--accent);
@@ -135,50 +148,282 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
-.insight-cell {
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.65rem;
-  color: var(--text-muted);
+.ac-info {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Distribution grid */
-.dist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.5rem;
+.ac-name {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.dist-card {
-  padding: 1rem;
-}
-
-.dist-title {
+.ac-meta {
   font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: var(--text-muted);
+}
+
+.ac-status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.ac-headline {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
   margin-bottom: 0.5rem;
 }
 
-.dist-labels {
+.ac-details {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.65rem;
+}
+
+.ac-detail {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.ac-metrics {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ac-metric {
+  flex: 1;
+}
+
+.acm-label {
+  display: block;
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.acm-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.acm-unit {
+  font-size: 0.45rem;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.ac-metric.highlight .acm-value {
+  color: var(--amber);
+}
+
+.ac-flags {
+  display: flex;
+  gap: 0.35rem;
   margin-top: 0.5rem;
 }
 
-.dist-dot-label {
-  font-size: 0.6rem;
-  color: var(--text-secondary);
+.ac-flag {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
+.ac-flag.alert {
+  background: var(--red-dim);
+  color: var(--red);
+}
+
+.ac-flag.watch {
+  background: var(--amber-dim);
+  color: var(--amber);
+}
+
+
+/* ================================================================
+   FLEET SYNTHESIS
+   ================================================================ */
+
+.synthesis-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.synthesis-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.synthesis-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 680px;
+}
+
+.synthesis-group {
+  margin-bottom: 1.5rem;
+}
+
+.sg-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.sg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sg-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.sg-count {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+}
+
+.synthesis-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.synthesis-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--border);
+  transition: background 0.15s;
+}
+
+.synthesis-card:hover {
+  background: var(--bg-card-hover);
+}
+
+.synthesis-card.sev-notable {
+  border-left-color: var(--amber);
+}
+
+.synthesis-card.sev-info {
+  border-left-color: var(--text-muted);
+}
+
+.sc-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.sc-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sc-zone {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+}
+
+.sc-text {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.sc-athletes {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sc-athlete-tag {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sc-data {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.sc-data-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.6rem;
+}
+
+.sc-data-name {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sc-data-val {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+}
+
+
+/* Loading */
 .dash-loading {
   display: flex;
   align-items: center;
@@ -190,16 +435,21 @@
   letter-spacing: 0.1em;
 }
 
+
 @media (max-width: 768px) {
   .dash-title {
     font-size: 1.75rem;
   }
 
-  .fleet-stats {
-    grid-template-columns: repeat(3, 1fr);
+  .fleet-bar {
+    flex-wrap: wrap;
   }
 
-  .dist-grid {
+  .fleet-stat {
+    min-width: 100px;
+  }
+
+  .athlete-cards {
     grid-template-columns: 1fr;
   }
 }

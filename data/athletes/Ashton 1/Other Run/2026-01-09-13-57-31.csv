@@ -1,0 +1,1 @@
+timestamp,sensor,gctMs,swingTime,strideTime,gaitCycleTime,cadence,gctPct,activityType,speedMps,vgrfAverage,fsaDeg,strideLenM,vgrfImpulseBws,vgrfActivePeakBw,lrInstantaneousBwps,vgrfCurveBnOutput0,vgrfCurveBnOutput1,vgrfCurveBnOutput2,vgrfCurveBnOutput3,acceleration,meters

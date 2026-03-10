@@ -1,152 +1,141 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchSummary } from "../api";
-import {
-  ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis,
-  CartesianGrid, Tooltip, Cell,
-} from "recharts";
 import "./Dashboard.css";
+
+const STATUS_CONFIG = {
+  on_track: { label: "ON TRACK", color: "var(--green)", bg: "var(--green-dim)" },
+  watch: { label: "WATCH", color: "var(--amber)", bg: "var(--amber-dim)" },
+  check_in: { label: "CHECK IN", color: "var(--red)", bg: "var(--red-dim)" },
+};
 
 export default function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [sortKey, setSortKey] = useState("name");
-  const [sortDir, setSortDir] = useState(1);
 
   useEffect(() => {
     fetchSummary().then(setSummary).finally(() => setLoading(false));
   }, []);
 
-  const sorted = useMemo(() => {
-    if (!summary?.athletes) return [];
-    return [...summary.athletes].sort((a, b) => {
-      const av = a[sortKey], bv = b[sortKey];
-      if (av == null) return 1;
-      if (bv == null) return -1;
-      if (typeof av === "string") return av.localeCompare(bv) * sortDir;
-      return (av - bv) * sortDir;
-    });
-  }, [summary, sortKey, sortDir]);
-
   if (loading) return <div className="dash-loading">Loading...</div>;
   if (!summary) return <div className="dash-loading">No data available</div>;
 
   const f = summary.fleet;
+  const athletes = summary.athletes || [];
+  const synthesis = summary.synthesis || [];
 
-  const handleSort = (key) => {
-    if (sortKey === key) setSortDir((d) => d * -1);
-    else { setSortKey(key); setSortDir(1); }
-  };
-
-  const SortHead = ({ k, children }) => (
-    <th onClick={() => handleSort(k)} className="sortable">
-      {children}
-      {sortKey === k && <span className="sort-arrow">{sortDir === 1 ? " \u25B2" : " \u25BC"}</span>}
-    </th>
-  );
+  const needsAttention = athletes.filter(a => a.status?.level !== "on_track");
+  const onTrack = athletes.filter(a => a.status?.level === "on_track" || !a.status);
 
   return (
     <div className="dashboard">
       <div className="dash-hero">
         <h1 className="dash-title">RUNNING INTELLIGENCE</h1>
-        <p className="dash-subtitle">Fleet performance overview</p>
+        <p className="dash-subtitle">Coach view — attention-first</p>
       </div>
 
-      <div className="fleet-stats">
+      {/* Fleet Overview */}
+      <div className="fleet-bar">
         <FleetStat value={f.total_athletes} label="Athletes" />
         <FleetStat value={f.total_sessions} label="Sessions" />
-        <FleetStat value={f.total_strides?.toLocaleString()} label="Strides" />
-        <FleetStat value={f.avg_gct_ms?.toFixed(0)} label="Fleet Avg GCT" unit="ms" />
-        <FleetStat value={f.avg_speed_mps?.toFixed(2)} label="Fleet Avg Speed" unit="m/s" />
-        <FleetStat value={f.avg_asymmetry_ms?.toFixed(1)} label="Avg Asymmetry" unit="ms" />
+        <FleetStat value={f.total_strides?.toLocaleString()} label="Total Strides" />
+        <FleetStat value={f.avg_gct_ms?.toFixed(0)} label="Fleet GCT" unit="ms" />
+        <FleetStat value={f.avg_speed_mps?.toFixed(2)} label="Fleet Speed" unit="m/s" />
       </div>
 
-      <div className="section-label" style={{ marginTop: "2rem" }}>Athlete Comparison</div>
-      <div className="table-wrap card">
-        <table className="athlete-table">
-          <thead>
-            <tr>
-              <SortHead k="name">Athlete</SortHead>
-              <SortHead k="session_count">Sessions</SortHead>
-              <SortHead k="total_strides">Strides</SortHead>
-              <SortHead k="avg_speed_mps">Speed</SortHead>
-              <SortHead k="avg_gct_ms">GCT</SortHead>
-              <SortHead k="avg_stride_len_m">Stride</SortHead>
-              <SortHead k="avg_cadence_spm">Cadence</SortHead>
-              <SortHead k="avg_vgrf_peak_bw">Peak vGRF</SortHead>
-              <SortHead k="gct_asymmetry_ms">Asymmetry</SortHead>
-              <th>Insight</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((a) => (
-              <tr key={a.id}>
-                <td>
-                  <Link to={`/athlete/${a.id}`} className="athlete-link">
-                    <span className="at-avatar">{a.name[0]}</span>
-                    {a.name}
-                  </Link>
-                </td>
-                <td>{a.session_count}</td>
-                <td>{a.total_strides?.toLocaleString()}</td>
-                <td>{a.avg_speed_mps?.toFixed(2)}</td>
-                <td>{a.avg_gct_ms?.toFixed(0)}</td>
-                <td>{a.avg_stride_len_m?.toFixed(2)}</td>
-                <td>{a.avg_cadence_spm?.toFixed(0)}</td>
-                <td>{a.avg_vgrf_peak_bw?.toFixed(2)}</td>
-                <td>
-                  {a.gct_asymmetry_ms != null && (
-                    <span className={`badge ${asym_badge(a.gct_asymmetry_ms)}`}>
-                      {Math.abs(a.gct_asymmetry_ms).toFixed(1)} ms
-                    </span>
-                  )}
-                </td>
-                <td className="insight-cell">{a.headline_insight || "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {summary.distributions && (
-        <>
-          <div className="section-label" style={{ marginTop: "2rem" }}>Metric Distributions</div>
-          <div className="dist-grid">
-            <DistChart
-              title="GCT (ms)"
-              data={summary.distributions.gct_ms}
-              athletes={sorted}
-              metricKey="avg_gct_ms"
-            />
-            <DistChart
-              title="Peak vGRF (BW)"
-              data={summary.distributions.vgrf_peak_bw}
-              athletes={sorted}
-              metricKey="avg_vgrf_peak_bw"
-            />
-            <DistChart
-              title="GCT Asymmetry (ms)"
-              data={summary.distributions.asymmetry_ms}
-              athletes={sorted}
-              metricKey="gct_asymmetry_ms"
-              abs
-            />
-            <DistChart
-              title="Speed (m/s)"
-              data={summary.distributions.speed_mps}
-              athletes={sorted}
-              metricKey="avg_speed_mps"
-            />
+      {/* Needs Attention */}
+      {needsAttention.length > 0 && (
+        <section className="dash-section">
+          <h2 className="dash-section-title">
+            <span className="attention-dot" />
+            Needs Attention
+            <span className="dash-section-count">{needsAttention.length}</span>
+          </h2>
+          <div className="athlete-cards">
+            {needsAttention.map(a => <AthleteCard key={a.id} athlete={a} />)}
           </div>
-        </>
+        </section>
+      )}
+
+      {/* On Track */}
+      {onTrack.length > 0 && (
+        <section className="dash-section">
+          <h2 className="dash-section-title">
+            <span className="ok-dot" />
+            {needsAttention.length > 0 ? "On Track" : "All Athletes"}
+            <span className="dash-section-count">{onTrack.length}</span>
+          </h2>
+          <div className="athlete-cards">
+            {onTrack.map(a => <AthleteCard key={a.id} athlete={a} />)}
+          </div>
+        </section>
+      )}
+
+      {/* Fleet Synthesis */}
+      {synthesis.length > 0 && (
+        <FleetSynthesis synthesis={synthesis} />
       )}
     </div>
   );
 }
 
-function asym_badge(v) {
-  const a = Math.abs(v);
-  return a > 15 ? "red" : a > 8 ? "amber" : "green";
+function AthleteCard({ athlete }) {
+  const a = athlete;
+  const status = a.status || {};
+  const cfg = STATUS_CONFIG[status.level] || STATUS_CONFIG.on_track;
+
+  return (
+    <Link to={`/athlete/${a.id}`} className="athlete-card">
+      <div className="ac-top">
+        <div className="ac-avatar">{a.name?.[0]}</div>
+        <div className="ac-info">
+          <div className="ac-name">{a.name}</div>
+          <div className="ac-meta">
+            {a.session_count} sessions · {a.total_strides?.toLocaleString()} strides
+          </div>
+        </div>
+        <div className="ac-status-badge" style={{ background: cfg.bg, color: cfg.color }}>
+          {cfg.label}
+        </div>
+      </div>
+
+      <div className="ac-headline">{status.headline || "No data"}</div>
+
+      {status.details?.length > 0 && (
+        <div className="ac-details">
+          {status.details.slice(0, 2).map((d, i) => (
+            <span key={i} className="ac-detail">{d}</span>
+          ))}
+        </div>
+      )}
+
+      <div className="ac-metrics">
+        <AcMetric label="Speed" value={a.avg_speed_mps?.toFixed(2)} unit="m/s" />
+        <AcMetric label="GCT" value={a.avg_gct_ms?.toFixed(0)} unit="ms" />
+        <AcMetric label="Stride" value={a.avg_stride_len_m?.toFixed(2)} unit="m" />
+        <AcMetric label="Distance" value={a.total_distance_mi?.toFixed(1)} unit="mi" />
+        <AcMetric label="Load" value={a.total_load?.toFixed(0)} />
+      </div>
+
+      {(a.alert_count > 0 || a.watch_count > 0) && (
+        <div className="ac-flags">
+          {a.alert_count > 0 && <span className="ac-flag alert">{a.alert_count} alerts</span>}
+          {a.watch_count > 0 && <span className="ac-flag watch">{a.watch_count} watch</span>}
+        </div>
+      )}
+    </Link>
+  );
+}
+
+function AcMetric({ label, value, unit, highlight }) {
+  return (
+    <div className={`ac-metric ${highlight ? "highlight" : ""}`}>
+      <span className="acm-label">{label}</span>
+      <span className="acm-value">
+        {value ?? "—"}{value != null && <span className="acm-unit">{unit}</span>}
+      </span>
+    </div>
+  );
 }
 
 function FleetStat({ value, label, unit }) {
@@ -161,56 +150,89 @@ function FleetStat({ value, label, unit }) {
   );
 }
 
-function DistChart({ title, data, athletes, metricKey, abs: useAbs }) {
-  if (!data || data.length === 0) return null;
+const CATEGORY_CONFIG = {
+  efficiency: { label: "Efficiency", color: "var(--accent)" },
+  mechanics: { label: "Mechanics", color: "var(--cyan)" },
+  asymmetry: { label: "Asymmetry", color: "var(--amber)" },
+  pattern: { label: "Shared Pattern", color: "var(--red)" },
+  fleet: { label: "Fleet", color: "var(--text-muted)" },
+  training: { label: "Training", color: "var(--green)" },
+};
 
-  const points = athletes
-    .filter((a) => a[metricKey] != null)
-    .map((a, i) => ({
-      name: a.name,
-      value: useAbs ? Math.abs(a[metricKey]) : a[metricKey],
-      idx: i,
-    }));
+function FleetSynthesis({ synthesis }) {
+  const grouped = {};
+  for (const s of synthesis) {
+    const cat = s.category || "fleet";
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(s);
+  }
 
-  if (points.length === 0) return null;
+  const categoryOrder = ["pattern", "efficiency", "asymmetry", "mechanics", "training", "fleet"];
+  const sortedCategories = categoryOrder.filter(c => grouped[c]);
 
   return (
-    <div className="card dist-card">
-      <div className="dist-title">{title}</div>
-      <ResponsiveContainer width="100%" height={120}>
-        <ScatterChart margin={{ top: 8, right: 12, bottom: 8, left: 12 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-          <XAxis
-            dataKey="value"
-            type="number"
-            tick={{ fontSize: 10, fill: "var(--text-muted)" }}
-            axisLine={{ stroke: "var(--border)" }}
-          />
-          <YAxis hide />
-          <Tooltip
-            contentStyle={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius-sm)",
-              fontSize: "0.7rem",
-              color: "var(--text-primary)",
-            }}
-            formatter={(v) => [v?.toFixed(2), title]}
-            labelFormatter={() => ""}
-            cursor={false}
-          />
-          <Scatter data={points} fill="var(--accent)">
-            {points.map((_, i) => (
-              <Cell key={i} fill="var(--accent)" />
-            ))}
-          </Scatter>
-        </ScatterChart>
-      </ResponsiveContainer>
-      <div className="dist-labels">
-        {points.map((p) => (
-          <span key={p.name} className="dist-dot-label">{p.name}: {p.value?.toFixed(1)}</span>
-        ))}
+    <section className="dash-section synthesis-section">
+      <h2 className="dash-section-title">
+        <span className="synthesis-dot" />
+        Fleet Synthesis
+        <span className="dash-section-count">{synthesis.length} insights</span>
+      </h2>
+      <p className="synthesis-desc">
+        Cross-athlete patterns and relationships. These insights emerge from comparing
+        athletes at the same pace, tracking shared deviations, and analyzing mechanical profiles
+        across the group. They become richer with more athletes and more sessions.
+      </p>
+
+      {sortedCategories.map(cat => {
+        const items = grouped[cat];
+        const cfg = CATEGORY_CONFIG[cat] || CATEGORY_CONFIG.fleet;
+        return (
+          <div key={cat} className="synthesis-group">
+            <div className="sg-header">
+              <span className="sg-dot" style={{ background: cfg.color }} />
+              <span className="sg-label">{cfg.label}</span>
+              <span className="sg-count">{items.length}</span>
+            </div>
+            <div className="synthesis-cards">
+              {items.map((s, i) => (
+                <SynthesisCard key={i} insight={s} cfg={cfg} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+function SynthesisCard({ insight, cfg }) {
+  const s = insight;
+  return (
+    <div className={`synthesis-card sev-${s.severity || "info"}`}>
+      <div className="sc-header">
+        <span className="sc-title">{s.title}</span>
+        {s.zone && <span className="sc-zone">{s.zone}</span>}
       </div>
+      <p className="sc-text">{s.text}</p>
+      {s.athletes && s.athletes.length > 0 && (
+        <div className="sc-athletes">
+          {s.athletes.map(name => (
+            <span key={name} className="sc-athlete-tag">{name}</span>
+          ))}
+        </div>
+      )}
+      {s.data && (
+        <div className="sc-data">
+          {Object.entries(s.data).map(([name, vals]) => (
+            <div key={name} className="sc-data-row">
+              <span className="sc-data-name">{name}</span>
+              {vals.gct != null && <span className="sc-data-val">GCT {vals.gct.toFixed(0)}ms</span>}
+              {vals.stride != null && <span className="sc-data-val">Stride {vals.stride.toFixed(2)}m</span>}
+              {vals.cadence != null && <span className="sc-data-val">Cad {vals.cadence.toFixed(0)}spm</span>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
