@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, createContext, useContext } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef, createContext, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { fetchAthlete } from "../api";
 import InteractiveSessionChart from "../components/charts/InteractiveSessionChart";
@@ -315,6 +315,8 @@ function FatigueProfile({ athlete }) {
 // ==========================================================================
 
 function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRunOnly, session, pace, speed, unit }) {
+  const calRef = useRef(null);
+
   const sessionsByDate = useMemo(() => {
     const map = {};
     sessions.forEach((s, i) => {
@@ -330,9 +332,9 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
     if (!dates.length) return [];
 
     const first = dates[0];
-    const last = dates[dates.length - 1];
+    const now = new Date();
+    const ly = now.getFullYear(), lm = now.getMonth() + 1;
     const [fy, fm] = first.split("-").map(Number);
-    const [ly, lm] = last.split("-").map(Number);
 
     const result = [];
     let y = fy, m = fm;
@@ -344,10 +346,17 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
     return result;
   }, [sessions]);
 
+  useEffect(() => {
+    if (calRef.current) {
+      calRef.current.scrollLeft = calRef.current.scrollWidth;
+    }
+  }, [months]);
+
   const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
   const MONTH_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const selectedDate = session?.date;
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="session-picker">
@@ -362,7 +371,7 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
         </button>
       </div>
 
-      <div className="cal-months">
+      <div className="cal-months" ref={calRef}>
         {months.map(({ year, month }) => {
           const firstDay = new Date(year, month - 1, 1);
           const daysInMonth = new Date(year, month, 0).getDate();
@@ -386,11 +395,12 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
                   const sessionIdxs = sessionsByDate[dateStr];
                   const hasSession = !!sessionIdxs;
                   const isSelected = dateStr === selectedDate;
+                  const isToday = dateStr === today;
 
                   return (
                     <button
                       key={i}
-                      className={`cal-cell ${hasSession ? "cal-has-session" : ""} ${isSelected ? "cal-selected" : ""}`}
+                      className={`cal-cell ${hasSession ? "cal-has-session" : ""} ${isSelected ? "cal-selected" : ""} ${isToday ? "cal-today" : ""}`}
                       disabled={!hasSession}
                       onClick={() => hasSession && onSelect(sessionIdxs[sessionIdxs.length - 1])}
                       title={hasSession ? `${sessionIdxs.length} session${sessionIdxs.length > 1 ? "s" : ""}` : ""}
@@ -644,34 +654,152 @@ function LoadTracking({ athlete }) {
 
 
 // ==========================================================================
-// SESSION TRENDS — cross-session metrics
+// SESSION TRENDS — interactive infographic with pill selector
 // ==========================================================================
+
+const TREND_DEFS = [
+  { key: "avg_speed_mps", label: "Speed", unit: "m/s", color: "#cdff00", higherBetter: true, icon: "→" },
+  { key: "avg_gct_ms", label: "GCT", unit: "ms", color: "#00d4ff", higherBetter: false, icon: "⏱" },
+  { key: "avg_cadence_spm", label: "Cadence", unit: "spm", color: "#ff6b6b", higherBetter: true, icon: "♩" },
+  { key: "avg_stride_len_m", label: "Stride", unit: "m", color: "#a78bfa", higherBetter: true, icon: "⟷" },
+  { key: "avg_vgrf_peak_bw", label: "vGRF", unit: "BW", color: "#fb923c", higherBetter: false, icon: "↓" },
+  { key: "avg_fsa_deg", label: "FSA", unit: "°", color: "#34d399", higherBetter: false, icon: "∠" },
+  { key: "avg_loading_rate", label: "Load Rate", unit: "BW/s", color: "#f472b6", higherBetter: false, icon: "⚡" },
+];
 
 function SessionTrends({ athlete }) {
   const sessions = athlete.sessions || [];
-  const [activeMetrics, setActiveMetrics] = useState(["avg_speed_mps", "avg_gct_ms"]);
-
-  const toggleMetric = useCallback((key) => {
-    setActiveMetrics((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
-  }, []);
+  const [activeKey, setActiveKey] = useState("avg_speed_mps");
+  const unit = useContext(UnitCtx);
 
   if (sessions.length < 2) return null;
 
+  const def = TREND_DEFS.find((d) => d.key === activeKey) || TREND_DEFS[0];
+  const points = sessions
+    .map((s, i) => ({ idx: i, date: s.date, val: s.metrics?.[activeKey], dist: s.distance_mi }))
+    .filter((p) => p.val != null);
+
+  if (!points.length) return null;
+
+  const vals = points.map((p) => p.val);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const range = max - min || 1;
+  const first = vals[0];
+  const last = vals[vals.length - 1];
+  const delta = last - first;
+  const deltaPct = first !== 0 ? (delta / first) * 100 : 0;
+  const improving = def.higherBetter ? delta > 0 : delta < 0;
+
+  const sparkW = 100;
+  const sparkH = 40;
+  const pathPoints = points.map((p, i) => {
+    const x = points.length > 1 ? (i / (points.length - 1)) * sparkW : sparkW / 2;
+    const y = sparkH - ((p.val - min) / range) * (sparkH - 4) - 2;
+    return `${x},${y}`;
+  });
+  const sparkPath = `M${pathPoints.join(" L")}`;
+
   return (
     <section className="v4-section">
-      <h2 className="section-heading">Trends Across Sessions</h2>
-      <p className="section-desc">
-        Toggle metrics to see how they evolve. Click a data point to jump to that session.
-      </p>
-      <div className="card">
-        <TrendPlot
-          sessions={sessions}
-          activeMetrics={activeMetrics}
-          onToggleMetric={toggleMetric}
-          height={320}
-        />
+      <h2 className="section-heading">Performance Trends</h2>
+      <p className="section-desc">Select a metric to explore how it evolves across sessions.</p>
+
+      <div className="trend-pills">
+        {TREND_DEFS.map((d) => {
+          const hasData = sessions.some((s) => s.metrics?.[d.key] != null);
+          if (!hasData) return null;
+          return (
+            <button
+              key={d.key}
+              className={`trend-pill ${activeKey === d.key ? "active" : ""}`}
+              style={{ "--pill-color": d.color }}
+              onClick={() => setActiveKey(d.key)}
+            >
+              <span className="tp-icon">{d.icon}</span>
+              {d.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="trend-infographic" style={{ "--trend-color": def.color }}>
+        <div className="trend-hero">
+          <div className="trend-hero-left">
+            <div className="trend-hero-icon">{def.icon}</div>
+            <div className="trend-hero-label">{def.label}</div>
+          </div>
+          <div className="trend-hero-center">
+            <div className="trend-hero-value">{last.toFixed(def.key.includes("stride") ? 3 : def.key.includes("speed") ? 2 : 0)}</div>
+            <div className="trend-hero-unit">{def.unit}</div>
+            <div className="trend-hero-sub">Latest</div>
+          </div>
+          <div className="trend-hero-right">
+            <div className={`trend-delta ${improving ? "positive" : "negative"}`}>
+              {delta > 0 ? "+" : ""}{delta.toFixed(def.key.includes("stride") ? 3 : 1)}
+              <span className="trend-delta-pct">({deltaPct > 0 ? "+" : ""}{deltaPct.toFixed(1)}%)</span>
+            </div>
+            <div className="trend-delta-label">{improving ? "Improving" : "Declining"}</div>
+          </div>
+        </div>
+
+        <div className="trend-spark-container">
+          <svg viewBox={`0 0 ${sparkW} ${sparkH}`} className="trend-spark-svg" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={`grad-${activeKey}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={def.color} stopOpacity="0.3" />
+                <stop offset="100%" stopColor={def.color} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d={`${sparkPath} L${sparkW},${sparkH} L0,${sparkH} Z`}
+              fill={`url(#grad-${activeKey})`}
+            />
+            <path d={sparkPath} fill="none" stroke={def.color} strokeWidth="1.5" />
+            {points.map((p, i) => {
+              const x = points.length > 1 ? (i / (points.length - 1)) * sparkW : sparkW / 2;
+              const y = sparkH - ((p.val - min) / range) * (sparkH - 4) - 2;
+              return <circle key={i} cx={x} cy={y} r="1.8" fill={def.color} opacity={i === points.length - 1 ? 1 : 0.5} />;
+            })}
+          </svg>
+          <div className="trend-spark-labels">
+            {points.length > 0 && <span>{points[0].date}</span>}
+            {points.length > 1 && <span>{points[points.length - 1].date}</span>}
+          </div>
+        </div>
+
+        <div className="trend-stat-row">
+          <div className="trend-stat">
+            <div className="ts-value">{avg.toFixed(def.key.includes("stride") ? 3 : 1)}</div>
+            <div className="ts-label">Average</div>
+          </div>
+          <div className="trend-stat">
+            <div className="ts-value">{max.toFixed(def.key.includes("stride") ? 3 : 1)}</div>
+            <div className="ts-label">Best</div>
+          </div>
+          <div className="trend-stat">
+            <div className="ts-value">{min.toFixed(def.key.includes("stride") ? 3 : 1)}</div>
+            <div className="ts-label">Worst</div>
+          </div>
+          <div className="trend-stat">
+            <div className="ts-value">{points.length}</div>
+            <div className="ts-label">Sessions</div>
+          </div>
+        </div>
+
+        {/* Per-session bars */}
+        <div className="trend-bars">
+          {points.map((p, i) => {
+            const pct = ((p.val - min) / range) * 100;
+            return (
+              <div key={i} className="trend-bar-wrap" title={`${p.date}: ${p.val.toFixed(2)} ${def.unit}`}>
+                <div className="trend-bar" style={{ height: `${Math.max(4, pct)}%` }} />
+                <span className="trend-bar-date">{p.date.slice(5)}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

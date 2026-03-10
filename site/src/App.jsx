@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import AthletePage from "./pages/AthletePage";
 import ModelsPage from "./pages/ModelsPage";
+import ShoeLab from "./pages/ShoeLab";
 import VisionPage from "./pages/VisionPage";
 import ThesisPage from "./pages/ThesisPage";
 import Layout from "./components/layout/Layout";
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/athlete/:id" element={<AthletePage />} />
         <Route path="/models" element={<ModelsPage />} />
+        <Route path="/shoes" element={<ShoeLab />} />
         <Route path="/vision" element={<VisionPage />} />
         <Route path="/thesis" element={<ThesisPage />} />
       </Routes>

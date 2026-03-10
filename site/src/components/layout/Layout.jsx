@@ -16,6 +16,9 @@ export default function Layout({ children }) {
           <NavLink to="/models" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
             Models
           </NavLink>
+          <NavLink to="/shoes" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+            Shoe Lab
+          </NavLink>
           <NavLink to="/vision" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
             Vision
           </NavLink>
