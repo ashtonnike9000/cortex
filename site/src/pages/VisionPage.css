@@ -4,9 +4,8 @@
   margin: 0 auto;
 }
 
-/* Hero */
 .vision-hero {
-  padding: 4rem 0 3rem;
+  padding: 5rem 0 3.5rem;
   text-align: center;
   position: relative;
 }
@@ -14,11 +13,11 @@
 .vision-hero::before {
   content: "";
   position: absolute;
-  top: 0;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -31,100 +30,115 @@
 }
 
 .vision-kicker {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
   color: var(--accent);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .vision-title {
-  font-size: 3.5rem;
+  font-size: 3.8rem;
   font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 1;
-  color: var(--text-primary);
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .vision-accent {
-  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
 }
 
 .vision-subtitle {
   font-size: 1rem;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.75;
   max-width: 550px;
-  margin: 1.5rem auto 0;
+  margin: 1.75rem auto 0;
 }
 
-/* Content sections */
+
+/* ================================================================
+   CONTENT
+   ================================================================ */
+
 .vision-content {
   padding: 0;
 }
 
 .vision-section {
-  padding: 2rem 0;
+  padding: 2.5rem 0;
 }
 
 .vision-era {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
 }
 
 .era-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.65rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 999px;
-  font-size: 0.55rem;
-  font-weight: 800;
+  font-size: 0.5rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   flex-shrink: 0;
+  border: 1px solid transparent;
 }
 
 .era-badge.current {
   background: var(--accent-dim);
   color: var(--accent);
+  border-color: rgba(205, 255, 0, 0.1);
 }
 
 .era-badge.near {
-  background: rgba(34, 211, 238, 0.1);
+  background: rgba(100, 210, 255, 0.08);
   color: var(--cyan);
+  border-color: rgba(100, 210, 255, 0.1);
 }
 
 .era-badge.future {
-  background: rgba(167, 139, 250, 0.1);
-  color: #a78bfa;
+  background: rgba(191, 90, 242, 0.08);
+  color: #bf5af2;
+  border-color: rgba(191, 90, 242, 0.1);
 }
 
 .era-title {
-  font-size: 1.5rem;
+  font-size: 1.55rem;
   font-weight: 900;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
 .vision-text {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.85;
   margin-bottom: 1.5rem;
 }
 
-/* Vision points */
+
+/* ================================================================
+   VISION POINTS
+   ================================================================ */
+
 .vision-points {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
 .vision-point {
   display: flex;
-  gap: 1rem;
+  gap: 1.1rem;
   align-items: flex-start;
 }
 
@@ -134,39 +148,43 @@
   border-radius: 50%;
   background: var(--accent);
   flex-shrink: 0;
-  margin-top: 0.55rem;
+  margin-top: 0.6rem;
+  box-shadow: 0 0 8px var(--accent-dim);
 }
 
 .vp-title {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
 }
 
 .vp-text {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
-/* Divider */
 .vision-divider {
   height: 1px;
   background: var(--border);
   margin: 0.5rem 0;
 }
 
-/* Coda */
+
+/* ================================================================
+   CODA
+   ================================================================ */
+
 .vision-coda {
   text-align: center;
-  padding: 3rem 0 1rem;
+  padding: 3.5rem 0 1rem;
 }
 
 .coda-text {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.85;
 }
 
 .coda-text strong {
@@ -174,20 +192,21 @@
   font-weight: 800;
 }
 
+
 @media (max-width: 640px) {
   .vision-title {
-    font-size: 2.25rem;
+    font-size: 2.4rem;
   }
 
   .vision-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
   }
 
   .era-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
   }
 
   .vision-hero {
-    padding: 2.5rem 0 2rem;
+    padding: 3rem 0 2rem;
   }
 }

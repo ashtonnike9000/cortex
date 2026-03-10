@@ -1,148 +1,202 @@
 .dashboard {
-  padding-bottom: 3rem;
+  padding-bottom: 4rem;
 }
 
+
+/* ================================================================
+   HERO
+   ================================================================ */
+
 .dash-hero {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .dash-title {
-  font-size: 2.5rem;
+  font-size: 3.2rem;
   font-weight: 900;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
   line-height: 1;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .dash-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 0.5rem;
+  letter-spacing: 0.06em;
+  margin-top: 0.65rem;
 }
 
-/* Fleet bar */
+
+/* ================================================================
+   FLEET BAR — glass stat pills
+   ================================================================ */
+
 .fleet-bar {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  gap: 0.65rem;
+  margin-bottom: 2.5rem;
   overflow-x: auto;
   padding-bottom: 0.25rem;
 }
 
 .fleet-stat {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0.85rem 1.25rem;
-  min-width: 120px;
+  padding: 1rem 1.5rem;
+  min-width: 130px;
   flex: 1;
+  transition: all 0.25s ease;
+}
+
+.fleet-stat:hover {
+  border-color: var(--border);
+  transform: translateY(-1px);
 }
 
 .fleet-stat-value {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 900;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   line-height: 1;
   color: var(--text-primary);
 }
 
 .fleet-stat-unit {
-  font-size: 0.55rem;
-  font-weight: 600;
+  font-size: 0.5rem;
+  font-weight: 500;
   color: var(--text-muted);
-  margin-left: 3px;
+  margin-left: 4px;
 }
 
 .fleet-stat-label {
-  font-size: 0.55rem;
-  font-weight: 700;
+  font-size: 0.5rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
-  margin-top: 0.35rem;
+  margin-top: 0.4rem;
 }
 
 
-/* Sections */
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+
 .dash-section {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .dash-section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 1rem;
 }
 
 .dash-section-count {
-  font-size: 0.6rem;
-  font-weight: 700;
+  font-size: 0.55rem;
+  font-weight: 600;
   color: var(--text-muted);
   background: var(--bg-card);
-  padding: 0.1rem 0.45rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 999px;
+  border: 1px solid var(--border-subtle);
 }
 
 .attention-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--amber);
+  box-shadow: 0 0 8px var(--amber-dim);
   flex-shrink: 0;
 }
 
 .ok-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--green);
+  box-shadow: 0 0 8px var(--green-dim);
   flex-shrink: 0;
 }
 
 
-/* Athlete cards */
+/* ================================================================
+   ATHLETE CARDS
+   ================================================================ */
+
 .athlete-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 0.75rem;
 }
 
 .athlete-card {
   display: flex;
   flex-direction: column;
   background: var(--bg-card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.5rem;
   border: 1px solid var(--border-subtle);
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   text-decoration: none;
   color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.athlete-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .athlete-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--border);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  transform: translateY(-2px);
   color: inherit;
   text-decoration: none;
+}
+
+.athlete-card:hover::before {
+  opacity: 1;
 }
 
 .ac-top {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 0.75rem;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .ac-avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: var(--accent-dim);
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent-medium));
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -150,6 +204,7 @@
   font-weight: 800;
   font-size: 0.85rem;
   flex-shrink: 0;
+  border: 1px solid var(--accent-dim);
 }
 
 .ac-info {
@@ -158,7 +213,7 @@
 }
 
 .ac-name {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -166,13 +221,14 @@
 .ac-meta {
   font-size: 0.6rem;
   color: var(--text-muted);
+  letter-spacing: 0.01em;
 }
 
 .ac-status-badge {
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 999px;
-  font-size: 0.5rem;
-  font-weight: 800;
+  font-size: 0.48rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   flex-shrink: 0;
@@ -181,27 +237,28 @@
 .ac-headline {
   font-size: 0.78rem;
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 0.5rem;
+  line-height: 1.55;
+  margin-bottom: 0.65rem;
 }
 
 .ac-details {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  margin-bottom: 0.65rem;
+  gap: 0.2rem;
+  margin-bottom: 0.75rem;
 }
 
 .ac-detail {
   font-size: 0.6rem;
   color: var(--text-muted);
-  font-family: monospace;
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  letter-spacing: 0.02em;
 }
 
 .ac-metrics {
   display: flex;
-  gap: 0.75rem;
-  padding-top: 0.65rem;
+  gap: 1rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -211,20 +268,21 @@
 
 .acm-label {
   display: block;
-  font-size: 0.5rem;
-  font-weight: 700;
+  font-size: 0.48rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
 }
 
 .acm-value {
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .acm-unit {
-  font-size: 0.45rem;
+  font-size: 0.42rem;
   color: var(--text-muted);
   margin-left: 2px;
 }
@@ -240,22 +298,25 @@
 }
 
 .ac-flag {
-  padding: 0.15rem 0.5rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  font-size: 0.5rem;
+  font-size: 0.48rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  border: 1px solid transparent;
 }
 
 .ac-flag.alert {
   background: var(--red-dim);
   color: var(--red);
+  border-color: rgba(255, 69, 58, 0.15);
 }
 
 .ac-flag.watch {
   background: var(--amber-dim);
   color: var(--amber);
+  border-color: rgba(255, 214, 10, 0.15);
 }
 
 
@@ -264,77 +325,84 @@
    ================================================================ */
 
 .synthesis-section {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
   border-top: 1px solid var(--border);
 }
 
 .synthesis-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-dim);
   flex-shrink: 0;
 }
 
 .synthesis-desc {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
   max-width: 680px;
 }
 
 .synthesis-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .sg-header {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
 }
 
 .sg-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .sg-label {
-  font-size: 0.6rem;
-  font-weight: 800;
+  font-size: 0.55rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
 }
 
 .sg-count {
-  font-size: 0.5rem;
+  font-size: 0.48rem;
   color: var(--text-muted);
   background: var(--bg-card);
-  padding: 0.05rem 0.35rem;
+  padding: 0.08rem 0.4rem;
   border-radius: 999px;
+  border: 1px solid var(--border-subtle);
 }
 
 .synthesis-cards {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .synthesis-card {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.35rem;
   border-left: 3px solid var(--border);
-  transition: background 0.15s;
+  transition: all 0.25s ease;
 }
 
 .synthesis-card:hover {
   background: var(--bg-card-hover);
+  border-color: var(--border);
+  border-left-color: inherit;
 }
 
 .synthesis-card.sev-notable {
@@ -349,55 +417,57 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
 }
 
 .sc-title {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .sc-zone {
-  font-size: 0.5rem;
+  font-size: 0.48rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
   background: var(--accent-dim);
-  padding: 0.1rem 0.4rem;
+  padding: 0.12rem 0.45rem;
   border-radius: 999px;
+  border: 1px solid rgba(205, 255, 0, 0.08);
 }
 
 .sc-text {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .sc-athletes {
   display: flex;
-  gap: 0.3rem;
-  margin-top: 0.5rem;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
   flex-wrap: wrap;
 }
 
 .sc-athlete-tag {
-  font-size: 0.5rem;
-  font-weight: 700;
+  font-size: 0.48rem;
+  font-weight: 600;
   color: var(--text-muted);
   background: var(--bg-elevated);
-  padding: 0.1rem 0.45rem;
+  padding: 0.12rem 0.5rem;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  border: 1px solid var(--border-subtle);
 }
 
 .sc-data {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
   border-top: 1px solid var(--border-subtle);
   flex-wrap: wrap;
 }
@@ -408,7 +478,8 @@
   gap: 0.4rem;
   background: var(--bg-secondary);
   border-radius: var(--radius-sm);
-  padding: 0.3rem 0.6rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border-subtle);
 }
 
 .sc-data-name {
@@ -423,22 +494,26 @@
 }
 
 
-/* Loading */
+/* ================================================================
+   LOADING
+   ================================================================ */
+
 .dash-loading {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 40vh;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-weight: 500;
 }
 
 
 @media (max-width: 768px) {
   .dash-title {
-    font-size: 1.75rem;
+    font-size: 2rem;
   }
 
   .fleet-bar {

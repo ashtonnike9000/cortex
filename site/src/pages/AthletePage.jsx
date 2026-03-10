@@ -255,11 +255,14 @@ function SessionExplorer({ athlete }) {
   const [selectedIdx, setSelectedIdx] = useState(sessions.length - 1);
   const [activeMetrics, setActiveMetrics] = useState(["speed", "gct"]);
   const [distRange, setDistRange] = useState(null);
+  const [runOnly, setRunOnly] = useState(true);
 
   const session = sessions[selectedIdx] || sessions[sessions.length - 1];
   if (!session) return null;
 
-  const ts = session.time_series || [];
+  const tsRaw = session.time_series || [];
+  const ts = runOnly ? tsRaw.filter((p) => p.running !== false) : tsRaw;
+  const filteredCount = tsRaw.length - ts.length;
 
   const toggleMetric = useCallback((key) => {
     setActiveMetrics((prev) =>
@@ -304,20 +307,55 @@ function SessionExplorer({ athlete }) {
 
   return (
     <section className="v4-section">
-      <div className="section-bar">
-        <h2 className="section-heading">Session Explorer</h2>
-        <select
-          className="session-select"
-          value={selectedIdx}
-          onChange={(e) => { setSelectedIdx(Number(e.target.value)); setDistRange(null); }}
-        >
-          {sessions.map((s, i) => (
-            <option key={s.date + s.label} value={i}>
-              {s.date} — {s.distance_mi?.toFixed(2)} mi — {s.n_strides} strides
-              {s.source ? ` (${s.source})` : ""}
-            </option>
-          ))}
-        </select>
+      <h2 className="section-heading">Session Explorer</h2>
+
+      <div className="session-picker">
+        <div className="session-picker-top">
+          <label className="session-picker-label">Analyzing Run</label>
+          <button
+            className={`run-filter-toggle ${runOnly ? "active" : ""}`}
+            onClick={() => setRunOnly((v) => !v)}
+            title={runOnly
+              ? `Showing running data only (${session.filter?.min_speed_mps ?? 1.8}–${session.filter?.max_speed_mps ?? 7.0} m/s). Click to show all.`
+              : "Showing all data including walking/noise. Click to filter."}
+          >
+            <span className="rft-dot" />
+            {runOnly ? "Running only" : "All data"}
+          </button>
+        </div>
+        <div className="session-picker-row">
+          <select
+            className="session-picker-select"
+            value={selectedIdx}
+            onChange={(e) => { setSelectedIdx(Number(e.target.value)); setDistRange(null); }}
+          >
+            {sessions.map((s, i) => (
+              <option key={s.date + s.label} value={i}>
+                {s.date} — {s.distance_mi?.toFixed(2)} mi — {s.n_running_strides ?? s.n_strides} strides
+                {s.source ? ` (${s.source})` : ""}
+              </option>
+            ))}
+          </select>
+          <div className="session-picker-summary">
+            <span className="sps-stat"><strong>{session.distance_mi?.toFixed(2)}</strong> mi</span>
+            <span className="sps-sep">·</span>
+            <span className="sps-stat"><strong>{pace || formatSpeed(speed, unit)}</strong> {pace ? "pace" : speedUnit(unit)}</span>
+            <span className="sps-sep">·</span>
+            <span className="sps-stat"><strong>{session.n_running_strides ?? session.n_strides}</strong> strides</span>
+            {session.n_filtered_out > 0 && (
+              <>
+                <span className="sps-sep">·</span>
+                <span className="sps-filtered">{session.n_filtered_out} non-run filtered</span>
+              </>
+            )}
+            {session.source && (
+              <>
+                <span className="sps-sep">·</span>
+                <span className="sps-source">{session.source}</span>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {distRange && (
@@ -478,7 +516,7 @@ function SessionTrends({ athlete }) {
 function DetailDrawer({ athlete }) {
   const sessions = athlete.sessions || [];
   const [selectedIdx, setSelectedIdx] = useState(sessions.length - 1);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const session = sessions[selectedIdx];
   if (!session) return null;
 
@@ -568,7 +606,7 @@ function SessionHistory({ athlete }) {
                   <td>{formatSpeed(speed, unit)} {speedUnit(unit)}</td>
                   <td>{s.metrics?.avg_gct_ms?.toFixed(0) || "—"} ms</td>
                   <td>{s.metrics?.avg_cadence_spm?.toFixed(0) || "—"}</td>
-                  <td>{s.n_strides}</td>
+                  <td>{s.n_running_strides ?? s.n_strides}</td>
                   <td>{s.load?.total?.toFixed(0) || "—"}</td>
                 </tr>
               );

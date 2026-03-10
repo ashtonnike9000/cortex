@@ -1,23 +1,33 @@
 .models-page {
-  padding-bottom: 3rem;
+  padding-bottom: 4rem;
 }
+
+
+/* ================================================================
+   HERO
+   ================================================================ */
 
 .models-hero {
   text-align: center;
-  padding: 2.5rem 1rem 1.5rem;
+  padding: 3rem 1rem 2rem;
 }
 
 .models-title {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 900;
   letter-spacing: -0.05em;
   line-height: 1;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .models-subtitle {
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin-top: 0.5rem;
+  margin-top: 0.65rem;
+  letter-spacing: 0.01em;
 }
 
 .models-loading {
@@ -25,40 +35,41 @@
   align-items: center;
   justify-content: center;
   min-height: 40vh;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
+  font-weight: 500;
 }
 
 
-/* ================================================================ */
-/* SECTIONS                                                         */
-/* ================================================================ */
+/* ================================================================
+   SECTIONS
+   ================================================================ */
 
 .models-section {
-  margin-top: 2.5rem;
+  margin-top: 3rem;
 }
 
 .ms-heading {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .ms-desc {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
   max-width: 700px;
 }
 
 
-/* ================================================================ */
-/* ATHLETE SELECTOR                                                 */
-/* ================================================================ */
+/* ================================================================
+   ATHLETE SELECTOR — pill buttons
+   ================================================================ */
 
 .athlete-selector {
   display: flex;
@@ -69,15 +80,17 @@
 .as-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
+  padding: 0.8rem 1.1rem;
   cursor: pointer;
   font-family: inherit;
   color: var(--text-secondary);
-  transition: all 0.15s;
+  transition: all 0.25s ease;
   text-align: left;
 }
 
@@ -86,21 +99,23 @@
 .as-btn.as-active {
   border-color: var(--accent);
   background: var(--accent-dim);
+  box-shadow: 0 0 16px var(--accent-dim);
 }
 
-.as-btn.as-no-data { opacity: 0.5; }
+.as-btn.as-no-data { opacity: 0.45; }
 
 .as-check {
   width: 18px;
   height: 18px;
-  border-radius: 4px;
+  border-radius: 5px;
   border: 2px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .as-active .as-check {
@@ -110,7 +125,7 @@
 }
 
 .as-name {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
@@ -120,25 +135,32 @@
 }
 
 
-/* ================================================================ */
-/* METHODOLOGY                                                      */
-/* ================================================================ */
+/* ================================================================
+   METHODOLOGY — glass card with numbered steps
+   ================================================================ */
 
 .methodology-card {
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
 }
 
 .meth-step {
   display: flex;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  gap: 1.35rem;
+  margin-bottom: 2.25rem;
+}
+
+.meth-step:last-of-type {
+  margin-bottom: 0;
 }
 
 .meth-step-num {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--accent);
   color: #000;
@@ -148,98 +170,123 @@
   font-weight: 800;
   font-size: 0.8rem;
   flex-shrink: 0;
+  box-shadow: 0 0 20px var(--accent-dim);
 }
 
 .meth-step-body { flex: 1; }
 
 .meth-step-title {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 800;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.55rem;
 }
 
 .meth-text {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
   line-height: 1.7;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.55rem;
 }
 
 .meth-formula {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
+  background: rgba(205, 255, 0, 0.04);
+  border: 1px solid rgba(205, 255, 0, 0.1);
   border-radius: var(--radius-sm);
-  padding: 0.6rem 1rem;
-  font-family: "SF Mono", "Fira Code", monospace;
-  font-size: 0.75rem;
+  padding: 0.7rem 1.1rem;
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.76rem;
   color: var(--accent);
-  margin: 0.75rem 0;
+  margin: 0.85rem 0;
   display: inline-block;
 }
 
 .meth-formula-big {
-  font-size: 0.9rem;
-  padding: 0.75rem 1.25rem;
+  font-size: 0.92rem;
+  padding: 0.85rem 1.35rem;
 }
 
 .meth-list {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-secondary);
-  line-height: 1.8;
-  padding-left: 1.2rem;
-  margin: 0.5rem 0;
+  line-height: 1.85;
+  padding-left: 1.25rem;
+  margin: 0.55rem 0;
 }
 
 .meth-caveats {
   border-top: 1px solid var(--border);
-  padding-top: 1.5rem;
-  margin-top: 1rem;
+  padding-top: 1.75rem;
+  margin-top: 1.25rem;
 }
 
 .meth-caveats-list li { color: var(--text-muted); }
 
 
-/* ================================================================ */
-/* ATHLETE MODEL CARDS                                              */
-/* ================================================================ */
+/* ================================================================
+   ATHLETE MODEL CARDS
+   ================================================================ */
 
 .athlete-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 0.85rem;
 }
 
 .amc-card {
   background: var(--bg-card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  border-left: 3px solid var(--accent);
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.amc-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.amc-card:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
 }
 
 .amc-card.amc-no-data {
-  border-left-color: var(--border);
-  opacity: 0.5;
+  opacity: 0.4;
+}
+
+.amc-card.amc-no-data::before {
+  background: var(--border);
 }
 
 .amc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .amc-name {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .amc-session-count {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   color: var(--text-muted);
 }
 
 .amc-reason {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   margin-top: 0.5rem;
 }
@@ -247,71 +294,78 @@
 .amc-predictions {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
 }
 
 .amc-pred {
   flex: 1;
   text-align: center;
   background: var(--bg-elevated);
-  border-radius: var(--radius-sm);
-  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 0.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.amc-pred:hover {
+  border-color: var(--border);
 }
 
 .amc-dist {
   display: block;
-  font-size: 0.55rem;
-  font-weight: 800;
+  font-size: 0.5rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
 }
 
 .amc-time {
   display: block;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 900;
   color: var(--accent);
   line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .amc-pace {
   display: block;
   font-size: 0.6rem;
   color: var(--text-secondary);
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
 }
 
 .amc-inputs-title {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.55rem;
 }
 
 .amc-inputs-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 .amc-input-row {
   display: flex;
   justify-content: space-between;
   font-size: 0.65rem;
-  padding: 0.2rem 0;
+  padding: 0.25rem 0;
 }
 
 .air-label { color: var(--text-muted); }
 .air-value { color: var(--text-secondary); font-weight: 600; }
 
 
-/* ================================================================ */
-/* COMPARISON TABLE                                                 */
-/* ================================================================ */
+/* ================================================================
+   COMPARISON TABLE
+   ================================================================ */
 
 .comp-table-wrap { overflow-x: auto; }
 
@@ -323,24 +377,32 @@
 
 .comp-table th {
   text-align: left;
-  font-size: 0.55rem;
-  font-weight: 700;
+  font-size: 0.52rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  padding: 0.5rem 0.6rem;
+  padding: 0.55rem 0.7rem;
   border-bottom: 1px solid var(--border);
 }
 
 .comp-sub-header th {
-  font-size: 0.5rem;
+  font-size: 0.48rem;
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0.25rem 0.6rem;
+  padding: 0.3rem 0.7rem;
 }
 
 .comp-table td {
-  padding: 0.6rem;
+  padding: 0.65rem 0.7rem;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+.comp-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.comp-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .comp-name { font-weight: 700; color: var(--text-primary); }
@@ -348,70 +410,76 @@
 .comp-pace { color: var(--text-secondary); }
 
 
-/* ================================================================ */
-/* FATIGUE COMPARISON                                               */
-/* ================================================================ */
+/* ================================================================
+   FATIGUE COMPARISON
+   ================================================================ */
 
 .fatigue-comp {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 1.75rem;
 }
 
 .fc-bars {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .fc-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .fc-name {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  min-width: 80px;
+  min-width: 85px;
 }
 
 .fc-bar-track {
   flex: 1;
-  height: 16px;
+  height: 14px;
   background: var(--bg-elevated);
-  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
   overflow: hidden;
 }
 
 .fc-bar-fill {
   height: 100%;
-  border-radius: 8px;
-  transition: width 0.5s ease;
+  border-radius: 7px;
+  transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .fc-score {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  min-width: 30px;
+  min-width: 35px;
   text-align: right;
+  letter-spacing: -0.02em;
 }
 
 .fc-note {
   font-size: 0.6rem;
   color: var(--text-muted);
-  margin-top: 0.75rem;
+  margin-top: 0.85rem;
 }
 
 
-/* ================================================================ */
-/* RESPONSIVE                                                       */
-/* ================================================================ */
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
 
 @media (max-width: 640px) {
-  .models-title { font-size: 1.75rem; }
+  .models-title { font-size: 2rem; }
   .athlete-results { grid-template-columns: 1fr; }
   .amc-predictions { flex-direction: column; gap: 0.5rem; }
   .amc-inputs-grid { grid-template-columns: 1fr; }
   .meth-step { flex-direction: column; gap: 0.75rem; }
+  .methodology-card { padding: 1.5rem; border-radius: var(--radius-lg); }
 }

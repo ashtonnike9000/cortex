@@ -6,17 +6,17 @@ const Plot = createPlotlyComponent(Plotly);
 
 const METRIC_DEFS = [
   { key: "speed", label: "Speed", unit: "m/s", color: "#CDFF00", axis: "y" },
-  { key: "gct", label: "GCT", unit: "ms", color: "#34d399", axis: "y2" },
-  { key: "cadence", label: "Cadence", unit: "spm", color: "#fbbf24", axis: "y3" },
-  { key: "vgrf_peak", label: "vGRF Peak", unit: "BW", color: "#f87171", axis: "y4" },
-  { key: "fsa", label: "FSA", unit: "°", color: "#22d3ee", axis: "y5" },
-  { key: "stride", label: "Stride Len", unit: "m", color: "#a78bfa", axis: "y6" },
-  { key: "lr", label: "Loading Rate", unit: "BW/s", color: "#fb923c", axis: "y7" },
+  { key: "gct", label: "GCT", unit: "ms", color: "#30d158", axis: "y2" },
+  { key: "cadence", label: "Cadence", unit: "spm", color: "#ffd60a", axis: "y3" },
+  { key: "vgrf_peak", label: "vGRF Peak", unit: "BW", color: "#ff453a", axis: "y4" },
+  { key: "fsa", label: "FSA", unit: "°", color: "#64d2ff", axis: "y5" },
+  { key: "stride", label: "Stride Len", unit: "m", color: "#bf5af2", axis: "y6" },
+  { key: "lr", label: "Loading Rate", unit: "BW/s", color: "#ff9f0a", axis: "y7" },
 ];
 
 const PLOTLY_BG = "rgba(0,0,0,0)";
-const GRID_COLOR = "#1e1e1e";
-const TEXT_COLOR = "#777";
+const GRID_COLOR = "rgba(255,255,255,0.04)";
+const TEXT_COLOR = "#48484a";
 
 export default function InteractiveSessionChart({
   timeSeries,
@@ -70,19 +70,19 @@ export default function InteractiveSessionChart({
         tickfont: { size: 9, color: TEXT_COLOR },
         gridcolor: GRID_COLOR,
         zeroline: false,
-        rangeslider: { bgcolor: "#111", bordercolor: "#333", thickness: 0.08 },
+        rangeslider: { bgcolor: "rgba(255,255,255,0.02)", bordercolor: "rgba(255,255,255,0.06)", thickness: 0.08 },
       },
       ...yAxes,
       showlegend: true,
       legend: {
         orientation: "h", y: -0.22,
-        font: { size: 10, color: "#aaa" },
+        font: { size: 10, color: "#a1a1a6" },
         bgcolor: PLOTLY_BG,
       },
       hovermode: "x unified",
       hoverlabel: {
-        bgcolor: "#161616", bordercolor: "#333",
-        font: { size: 11, color: "#fff", family: "Inter, sans-serif" },
+        bgcolor: "rgba(20,20,20,0.9)", bordercolor: "rgba(255,255,255,0.08)",
+        font: { size: 11, color: "#f5f5f7", family: "Inter, sans-serif" },
       },
     };
   }, [activeMetrics]);

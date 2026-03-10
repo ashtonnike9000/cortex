@@ -6,12 +6,12 @@ const Plot = createPlotlyComponent(Plotly);
 
 const SPLIT_METRICS = [
   { key: "avg_speed_mps", label: "Speed (m/s)", color: "#CDFF00" },
-  { key: "avg_gct_ms", label: "GCT (ms)", color: "#34d399" },
-  { key: "avg_cadence_spm", label: "Cadence (spm)", color: "#fbbf24" },
-  { key: "avg_vgrf_peak_bw", label: "vGRF Peak (BW)", color: "#f87171" },
-  { key: "avg_fsa_deg", label: "FSA (°)", color: "#22d3ee" },
-  { key: "avg_stride_len_m", label: "Stride (m)", color: "#a78bfa" },
-  { key: "avg_loading_rate", label: "Loading Rate (BW/s)", color: "#fb923c" },
+  { key: "avg_gct_ms", label: "GCT (ms)", color: "#30d158" },
+  { key: "avg_cadence_spm", label: "Cadence (spm)", color: "#ffd60a" },
+  { key: "avg_vgrf_peak_bw", label: "vGRF Peak (BW)", color: "#ff453a" },
+  { key: "avg_fsa_deg", label: "FSA (°)", color: "#64d2ff" },
+  { key: "avg_stride_len_m", label: "Stride (m)", color: "#bf5af2" },
+  { key: "avg_loading_rate", label: "Loading Rate (BW/s)", color: "#ff9f0a" },
 ];
 
 function mpsToMinPerMile(mps) {
@@ -70,24 +70,24 @@ export default function MileSplitsChart({ splits, height = 300 }) {
   const layout = {
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
-    font: { family: "Inter, sans-serif", color: "#777" },
+    font: { family: "Inter, sans-serif", color: "#48484a" },
     margin: { t: 10, b: 40, l: 50, r: 10 },
     xaxis: {
-      tickfont: { size: 10, color: "#777" },
+      tickfont: { size: 10, color: "#48484a" },
       gridcolor: "transparent",
     },
     yaxis: {
-      title: { text: metricDef.label, font: { size: 10, color: "#aaa" } },
-      tickfont: { size: 9, color: "#777" },
-      gridcolor: "#1e1e1e",
+      title: { text: metricDef.label, font: { size: 10, color: "#a1a1a6" } },
+      tickfont: { size: 9, color: "#48484a" },
+      gridcolor: "rgba(255,255,255,0.04)",
       zeroline: false,
     },
-    bargap: 0.2,
+    bargap: 0.25,
     showlegend: false,
     hoverlabel: {
-      bgcolor: "#161616",
-      bordercolor: "#333",
-      font: { size: 11, color: "#fff", family: "Inter, sans-serif" },
+      bgcolor: "rgba(20,20,20,0.9)",
+      bordercolor: "rgba(255,255,255,0.08)",
+      font: { size: 11, color: "#f5f5f7", family: "Inter, sans-serif" },
     },
   };
 

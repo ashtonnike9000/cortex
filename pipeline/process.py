@@ -66,6 +66,9 @@ SPEED_ZONE_BOUNDS = [
     ("tempo", 4.5, 5.5), ("fast", 5.5, 7.0), ("sprint", 7.0, 100),
 ]
 
+RUN_SPEED_MIN = 1.8   # m/s — below this is walking (~14:50/mi)
+RUN_SPEED_MAX = 7.0   # m/s — above this is likely sensor noise (~3:50/mi)
+
 
 # ---------------------------------------------------------------------------
 # Utility helpers
@@ -146,6 +149,19 @@ def safe_std(values):
 
 def extract(strides, key):
     return [s.get(key) for s in strides if s.get(key) is not None]
+
+
+def is_running_stride(stride) -> bool:
+    """True if the stride's speed falls within a reasonable running range."""
+    spd = stride.get("speed_mps")
+    if spd is None or (isinstance(spd, float) and pd.isna(spd)):
+        return False
+    return RUN_SPEED_MIN <= spd <= RUN_SPEED_MAX
+
+
+def filter_running(strides: list) -> list:
+    """Return only strides that look like actual running."""
+    return [s for s in strides if is_running_stride(s)]
 
 
 # ---------------------------------------------------------------------------
@@ -312,47 +328,58 @@ def _extract_date_from_filename(filename: str) -> str:
 # ---------------------------------------------------------------------------
 
 def build_session(date: str, label: str, left: list, right: list, source_label: str | None = None) -> dict:
-    all_s = left + right
-    speed_zones = build_speed_zones(all_s)
-    fatigue = build_fatigue(left, right)
-    bilateral = build_bilateral(left, right)
-    ts = build_time_series(all_s)
-    mile_splits = build_mile_splits(all_s)
+    all_raw = left + right
 
-    l_gct, r_gct = extract(left, "gct_ms"), extract(right, "gct_ms")
-    l_sl, r_sl = extract(left, "stride_len_m"), extract(right, "stride_len_m")
-    l_fsa, r_fsa = extract(left, "fsa_deg"), extract(right, "fsa_deg")
+    # Filtered sets — used for all metric computations
+    left_f = filter_running(left)
+    right_f = filter_running(right)
+    all_f = left_f + right_f
 
-    stride_lens = extract(all_s, "stride_len_m")
+    n_filtered_out = len(all_raw) - len(all_f)
+
+    speed_zones = build_speed_zones(all_f)
+    fatigue = build_fatigue(left_f, right_f)
+    bilateral = build_bilateral(left_f, right_f)
+    ts = build_time_series(all_raw)  # time series keeps ALL data with running flag
+    mile_splits = build_mile_splits(all_f)
+
+    l_gct, r_gct = extract(left_f, "gct_ms"), extract(right_f, "gct_ms")
+    l_sl, r_sl = extract(left_f, "stride_len_m"), extract(right_f, "stride_len_m")
+    l_fsa, r_fsa = extract(left_f, "fsa_deg"), extract(right_f, "fsa_deg")
+
+    stride_lens = extract(all_f, "stride_len_m")
     total_distance_m = round(sum(stride_lens), 1) if stride_lens else 0
     total_distance_mi = round(total_distance_m / 1609.344, 2) if total_distance_m else 0
 
-    load = build_load_metrics(all_s, total_distance_mi)
+    load = build_load_metrics(all_f, total_distance_mi)
 
     result = {
         "date": date, "label": label,
-        "n_strides": len(all_s), "n_left": len(left), "n_right": len(right),
+        "n_strides": len(all_raw), "n_left": len(left), "n_right": len(right),
+        "n_running_strides": len(all_f),
+        "n_filtered_out": n_filtered_out,
         "distance_m": total_distance_m,
         "distance_mi": total_distance_mi,
+        "filter": {"min_speed_mps": RUN_SPEED_MIN, "max_speed_mps": RUN_SPEED_MAX},
         "metrics": {
-            "avg_speed_mps": safe_mean(extract(all_s, "speed_mps")),
-            "max_speed_mps": safe_max(extract(all_s, "speed_mps")),
-            "avg_gct_ms": safe_mean(extract(all_s, "gct_ms")),
-            "std_gct_ms": safe_std(extract(all_s, "gct_ms")),
-            "avg_stride_len_m": safe_mean(extract(all_s, "stride_len_m")),
-            "avg_cadence_spm": safe_mean(extract(all_s, "cadence")),
-            "avg_fsa_deg": safe_mean(extract(all_s, "fsa_deg")),
-            "avg_vgrf_bw": safe_mean(extract(all_s, "vgrf_avg")),
-            "avg_vgrf_peak_bw": safe_mean(extract(all_s, "vgrf_peak")),
-            "avg_loading_rate": safe_mean(extract(all_s, "loading_rate")),
+            "avg_speed_mps": safe_mean(extract(all_f, "speed_mps")),
+            "max_speed_mps": safe_max(extract(all_f, "speed_mps")),
+            "avg_gct_ms": safe_mean(extract(all_f, "gct_ms")),
+            "std_gct_ms": safe_std(extract(all_f, "gct_ms")),
+            "avg_stride_len_m": safe_mean(extract(all_f, "stride_len_m")),
+            "avg_cadence_spm": safe_mean(extract(all_f, "cadence")),
+            "avg_fsa_deg": safe_mean(extract(all_f, "fsa_deg")),
+            "avg_vgrf_bw": safe_mean(extract(all_f, "vgrf_avg")),
+            "avg_vgrf_peak_bw": safe_mean(extract(all_f, "vgrf_peak")),
+            "avg_loading_rate": safe_mean(extract(all_f, "loading_rate")),
         },
         "asymmetry": {
             "gct_ms": round(safe_mean(l_gct) - safe_mean(r_gct), 3) if l_gct and r_gct else None,
             "stride_len_m": round(safe_mean(l_sl) - safe_mean(r_sl), 3) if l_sl and r_sl else None,
             "fsa_deg": round(safe_mean(l_fsa) - safe_mean(r_fsa), 3) if l_fsa and r_fsa else None,
         },
-        "left_summary": _side_summary(left),
-        "right_summary": _side_summary(right),
+        "left_summary": _side_summary(left_f),
+        "right_summary": _side_summary(right_f),
         "bilateral": bilateral, "speed_zones": speed_zones,
         "fatigue": fatigue, "time_series": ts,
         "mile_splits": mile_splits,
@@ -513,6 +540,7 @@ def build_time_series(strides):
             if v is not None:
                 pt[out] = round(v, 3) if isinstance(v, float) else v
         pt["foot"] = s.get("foot", "unknown")
+        pt["running"] = is_running_stride(s)
         points.append(pt)
     return points
 
@@ -632,7 +660,9 @@ def main():
 
         sessions.sort(key=lambda s: s["date"])
         total = sum(s["n_strides"] for s in sessions)
-        print(f"  {len(sessions)} sessions, {total} strides")
+        total_running = sum(s.get("n_running_strides", s["n_strides"]) for s in sessions)
+        total_filtered = total - total_running
+        print(f"  {len(sessions)} sessions, {total} strides ({total_filtered} filtered as non-running)")
 
         # Cumulative load tracking across sessions
         cum_load = 0.0
@@ -641,10 +671,12 @@ def main():
             cum_load += session_load
             s["load"]["cumulative"] = round(cum_load, 2)
 
-        aggregate = build_session("all", "All Runs", al, ar)
+        al_f = filter_running(al)
+        ar_f = filter_running(ar)
+        aggregate = build_session("all", "All Runs", al_f, ar_f)
         insights = generate_insights(sessions, aggregate)
 
-        baseline = compute_baseline(al, ar)
+        baseline = compute_baseline(al_f, ar_f)
         all_deviations = {}
         for s in sessions:
             devs = compute_session_deviations(s, baseline)

@@ -5,8 +5,8 @@ import Plotly from "plotly.js-dist-min";
 const Plot = createPlotlyComponent(Plotly);
 
 const SESSION_COLORS = [
-  "#CDFF00", "#34d399", "#22d3ee", "#fbbf24", "#f87171",
-  "#a78bfa", "#fb923c", "#e879f9", "#6ee7b7", "#fca5a5",
+  "#CDFF00", "#30d158", "#64d2ff", "#ffd60a", "#ff453a",
+  "#bf5af2", "#ff9f0a", "#ff375f", "#5e5ce6", "#ac8e68",
 ];
 
 const METRIC_OPTIONS = [
@@ -54,32 +54,32 @@ export default function SessionOverlayChart({
     () => ({
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      font: { family: "Inter, sans-serif", color: "#777" },
+      font: { family: "Inter, sans-serif", color: "#48484a" },
       margin: { t: 10, b: 50, l: 55, r: 20 },
       xaxis: {
-        title: { text: "Distance (mi)", font: { size: 11, color: "#777" } },
-        tickfont: { size: 9, color: "#777" },
-        gridcolor: "#1e1e1e",
+        title: { text: "Distance (mi)", font: { size: 11, color: "#48484a" } },
+        tickfont: { size: 9, color: "#48484a" },
+        gridcolor: "rgba(255,255,255,0.04)",
         zeroline: false,
       },
       yaxis: {
-        title: { text: metricDef.label, font: { size: 11, color: "#aaa" } },
-        tickfont: { size: 9, color: "#777" },
-        gridcolor: "#1e1e1e",
+        title: { text: metricDef.label, font: { size: 11, color: "#a1a1a6" } },
+        tickfont: { size: 9, color: "#48484a" },
+        gridcolor: "rgba(255,255,255,0.04)",
         zeroline: false,
       },
       showlegend: true,
       legend: {
         orientation: "h",
         y: -0.2,
-        font: { size: 10, color: "#aaa" },
+        font: { size: 10, color: "#a1a1a6" },
         bgcolor: "rgba(0,0,0,0)",
       },
       hovermode: "x unified",
       hoverlabel: {
-        bgcolor: "#161616",
-        bordercolor: "#333",
-        font: { size: 11, color: "#fff", family: "Inter, sans-serif" },
+        bgcolor: "rgba(20,20,20,0.9)",
+        bordercolor: "rgba(255,255,255,0.08)",
+        font: { size: 11, color: "#f5f5f7", family: "Inter, sans-serif" },
       },
     }),
     [metricDef]

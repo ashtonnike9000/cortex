@@ -7,6 +7,7 @@ export default function Layout({ children }) {
       <header className="topbar">
         <Link to="/" className="logo">
           <span className="logo-text">CORTEX</span>
+          <span className="logo-accent" />
         </Link>
         <nav className="nav-links">
           <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`} end>

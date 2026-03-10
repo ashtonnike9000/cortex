@@ -4,10 +4,13 @@
   margin: 0 auto;
 }
 
-/* ── Hero ─────────────────────────────────────────────── */
+
+/* ================================================================
+   HERO
+   ================================================================ */
 
 .thesis-hero {
-  padding: 5rem 0 3rem;
+  padding: 5.5rem 0 3.5rem;
   text-align: center;
   position: relative;
 }
@@ -18,8 +21,8 @@
   top: -40px;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
+  width: 650px;
+  height: 650px;
   background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -32,61 +35,67 @@
 }
 
 .thesis-kicker {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.3em;
   color: var(--accent);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
 }
 
 .thesis-title {
-  font-size: 4rem;
+  font-size: 4.2rem;
   font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.95;
-  color: var(--text-primary);
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .thesis-accent {
-  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
 }
 
 .thesis-subtitle {
   font-size: 0.95rem;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.85;
   max-width: 600px;
-  margin: 1.75rem auto 0;
+  margin: 1.85rem auto 0;
 }
 
-/* ── Sections ────────────────────────────────────────── */
+
+/* ================================================================
+   SECTIONS
+   ================================================================ */
 
 .thesis-section {
   padding: 2.5rem 0;
 }
 
 .thesis-section-label {
-  font-size: 0.55rem;
-  font-weight: 800;
+  font-size: 0.52rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.3em;
   color: var(--accent);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.7rem;
 }
 
 .thesis-section-title {
-  font-size: 1.75rem;
+  font-size: 1.8rem;
   font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin-bottom: 1rem;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  margin-bottom: 1.1rem;
 }
 
 .thesis-text {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.85;
   margin-bottom: 1.5rem;
 }
 
@@ -101,58 +110,62 @@
   margin: 0.5rem 0;
 }
 
-/* ── Credo ────────────────────────────────────────────── */
+
+/* ================================================================
+   CREDO STRIP
+   ================================================================ */
 
 .credo-strip {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
 }
 
 .credo-step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  min-width: 90px;
+  gap: 0.35rem;
+  min-width: 95px;
 }
 
 .credo-number {
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   font-weight: 700;
   color: var(--accent);
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--accent-dim);
+  border: 1px solid rgba(205, 255, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .credo-word {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   font-weight: 900;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
 }
 
 .credo-desc {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .credo-arrow {
-  width: 32px;
+  width: 36px;
   height: 2px;
   background: var(--border);
   flex-shrink: 0;
   position: relative;
-  margin: 0 0.25rem;
+  margin: 0 0.3rem;
   margin-bottom: 1rem;
 }
 
@@ -174,42 +187,52 @@
   margin: 0 auto;
 }
 
-/* ── Landscape cards ─────────────────────────────────── */
+
+/* ================================================================
+   LANDSCAPE CARDS
+   ================================================================ */
 
 .landscape-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
 }
 
 .landscape-card {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.35rem;
   border: 1px solid var(--border-subtle);
-  transition: border-color 0.2s;
+  transition: all 0.25s ease;
+}
+
+.landscape-card:hover {
+  border-color: var(--border);
 }
 
 .landscape-card.highlighted {
-  border-color: var(--accent);
+  border-color: rgba(205, 255, 0, 0.2);
   background: linear-gradient(135deg, rgba(205, 255, 0, 0.03) 0%, var(--bg-card) 100%);
+  box-shadow: var(--shadow-glow);
 }
 
 .lc-header {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .lc-name {
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
 }
 
 .lc-covers {
-  font-size: 0.55rem;
-  font-weight: 700;
+  font-size: 0.52rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text-muted);
@@ -222,97 +245,109 @@
 .lc-desc {
   font-size: 0.78rem;
   color: var(--text-secondary);
-  line-height: 1.65;
-  margin-bottom: 0.75rem;
+  line-height: 1.7;
+  margin-bottom: 0.85rem;
 }
 
 .lc-limit {
   font-size: 0.72rem;
   color: var(--text-muted);
-  line-height: 1.6;
-  padding-top: 0.65rem;
+  line-height: 1.65;
+  padding-top: 0.7rem;
   border-top: 1px solid var(--border-subtle);
   font-style: italic;
 }
 
-/* ── System Flow ─────────────────────────────────────── */
+
+/* ================================================================
+   SYSTEM FLOW
+   ================================================================ */
 
 .system-flow {
   margin-top: 2rem;
 }
 
 .flow-layer {
-  padding: 1.25rem;
+  padding: 1.35rem;
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
 }
 
 .flow-layer-fusion {
   background: linear-gradient(135deg, rgba(205, 255, 0, 0.02) 0%, var(--bg-card) 100%);
-  border-color: rgba(205, 255, 0, 0.12);
+  border-color: rgba(205, 255, 0, 0.1);
 }
 
 .flow-label {
-  font-size: 0.55rem;
-  font-weight: 800;
+  font-size: 0.52rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
   color: var(--text-muted);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .flow-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .source-chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.3rem 0.7rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 999px;
-  font-size: 0.6rem;
-  font-weight: 700;
+  font-size: 0.58rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
+  border: 1px solid transparent;
 }
 
 .chip-gait {
   background: var(--accent-dim);
   color: var(--accent);
+  border-color: rgba(205, 255, 0, 0.08);
 }
 
 .chip-cardio {
   background: var(--red-dim);
   color: var(--red);
+  border-color: rgba(255, 69, 58, 0.08);
 }
 
 .chip-spatial {
-  background: rgba(34, 211, 238, 0.1);
+  background: rgba(100, 210, 255, 0.08);
   color: var(--cyan);
+  border-color: rgba(100, 210, 255, 0.08);
 }
 
 .chip-visual {
-  background: rgba(167, 139, 250, 0.1);
-  color: #a78bfa;
+  background: rgba(191, 90, 242, 0.08);
+  color: #bf5af2;
+  border-color: rgba(191, 90, 242, 0.08);
 }
 
 .chip-subjective {
   background: var(--amber-dim);
   color: var(--amber);
+  border-color: rgba(255, 214, 10, 0.08);
 }
 
 .chip-lab {
   background: var(--green-dim);
   color: var(--green);
+  border-color: rgba(48, 209, 88, 0.08);
 }
 
 .flow-connector {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 0;
+  gap: 0.85rem;
+  padding: 0.85rem 0;
 }
 
 .flow-line {
@@ -322,29 +357,38 @@
 }
 
 .flow-connector-label {
-  font-size: 0.55rem;
-  font-weight: 700;
+  font-size: 0.52rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-/* ── Fusion rules ────────────────────────────────────── */
+
+/* ================================================================
+   FUSION RULES
+   ================================================================ */
 
 .fusion-examples {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
 .fusion-rule {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(0, 0, 0, 0.25);
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
+  transition: border-color 0.2s ease;
+}
+
+.fusion-rule:hover {
+  border-color: var(--border);
 }
 
 .fusion-signals {
@@ -362,54 +406,64 @@
 }
 
 .fusion-meaning {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-/* ── Output cards ────────────────────────────────────── */
+
+/* ================================================================
+   OUTPUT CARDS
+   ================================================================ */
 
 .output-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .output-card {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
-  padding: 1.5rem 1.25rem;
+  padding: 1.6rem 1.35rem;
   border: 1px solid var(--border-subtle);
+  transition: border-color 0.25s ease;
+}
+
+.output-card:hover {
+  border-color: var(--border);
 }
 
 .oc-icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--accent-dim);
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent-medium));
   color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 900;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .oc-audience {
-  font-size: 0.55rem;
-  font-weight: 700;
+  font-size: 0.52rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   color: var(--text-muted);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
 }
 
 .oc-headline {
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .oc-items {
@@ -417,14 +471,14 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .oc-item {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-secondary);
-  line-height: 1.5;
-  padding-left: 0.85rem;
+  line-height: 1.55;
+  padding-left: 0.9rem;
   position: relative;
 }
 
@@ -432,58 +486,76 @@
   content: "";
   position: absolute;
   left: 0;
-  top: 0.45em;
+  top: 0.48em;
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: var(--accent);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
-/* ── Differentiator cards ────────────────────────────── */
+
+/* ================================================================
+   DIFFERENTIATOR CARDS
+   ================================================================ */
 
 .diff-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
 }
 
 .diff-card {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.35rem;
   border: 1px solid var(--border-subtle);
+  transition: border-color 0.25s ease;
+}
+
+.diff-card:hover {
+  border-color: var(--border);
 }
 
 .diff-title {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.55rem;
 }
 
 .diff-text {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
-/* ── Translation example ─────────────────────────────── */
+
+/* ================================================================
+   TRANSLATION EXAMPLE
+   ================================================================ */
 
 .translation-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.85rem;
   margin-top: 0.5rem;
 }
 
 .translation-card {
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.35rem;
   border: 1px solid var(--border-subtle);
   position: relative;
   overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+
+.translation-card:hover {
+  border-color: var(--border);
 }
 
 .translation-card::before {
@@ -497,6 +569,8 @@
 
 .translation-athlete {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .translation-athlete::before {
@@ -505,6 +579,8 @@
 
 .translation-product {
   background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .translation-product::before {
@@ -512,40 +588,46 @@
 }
 
 .translation-header {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .translation-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.55rem;
+  padding: 0.22rem 0.6rem;
   border-radius: 999px;
-  font-size: 0.55rem;
-  font-weight: 800;
+  font-size: 0.5rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
+  border: 1px solid transparent;
 }
 
 .translation-badge.athlete {
   background: var(--accent-dim);
   color: var(--accent);
+  border-color: rgba(205, 255, 0, 0.08);
 }
 
 .translation-badge.product {
-  background: rgba(34, 211, 238, 0.1);
+  background: rgba(100, 210, 255, 0.08);
   color: var(--cyan);
+  border-color: rgba(100, 210, 255, 0.08);
 }
 
 .translation-body {
   font-size: 0.78rem;
   color: var(--text-secondary);
-  line-height: 1.75;
+  line-height: 1.8;
 }
 
-/* ── Evolution timeline ──────────────────────────────── */
+
+/* ================================================================
+   EVOLUTION TIMELINE
+   ================================================================ */
 
 .evolution-timeline {
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -553,7 +635,7 @@
 
 .evo-phase {
   display: flex;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
 .evo-marker {
@@ -571,22 +653,23 @@
   background: var(--border);
   flex-shrink: 0;
   margin-top: 0.2rem;
+  transition: all 0.3s ease;
 }
 
 .evo-complete .evo-dot {
   background: var(--accent);
-  box-shadow: 0 0 8px rgba(205, 255, 0, 0.3);
+  box-shadow: 0 0 10px rgba(205, 255, 0, 0.25);
 }
 
 .evo-active .evo-dot {
   background: var(--accent);
-  box-shadow: 0 0 12px rgba(205, 255, 0, 0.4);
-  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 14px rgba(205, 255, 0, 0.35);
+  animation: pulse 2.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(205, 255, 0, 0.3); }
-  50% { box-shadow: 0 0 16px rgba(205, 255, 0, 0.5); }
+  0%, 100% { box-shadow: 0 0 10px rgba(205, 255, 0, 0.25); }
+  50% { box-shadow: 0 0 20px rgba(205, 255, 0, 0.45); }
 }
 
 .evo-line {
@@ -601,61 +684,68 @@
 }
 
 .evo-content {
-  padding-bottom: 1.5rem;
+  padding-bottom: 1.75rem;
 }
 
 .evo-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.15rem 0.5rem;
+  padding: 0.17rem 0.55rem;
   border-radius: 999px;
-  font-size: 0.5rem;
-  font-weight: 800;
+  font-size: 0.48rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.35rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.4rem;
+  border: 1px solid transparent;
 }
 
 .evo-badge.complete {
   background: var(--accent-dim);
   color: var(--accent);
+  border-color: rgba(205, 255, 0, 0.08);
 }
 
 .evo-badge.active {
   background: var(--accent-medium);
   color: var(--accent);
+  border-color: rgba(205, 255, 0, 0.12);
 }
 
 .evo-badge.planned {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--text-muted);
+  border-color: var(--border-subtle);
 }
 
 .evo-title {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
 }
 
 .evo-desc {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
-/* ── Coda ─────────────────────────────────────────────── */
+
+/* ================================================================
+   CODA
+   ================================================================ */
 
 .thesis-coda {
   text-align: center;
-  padding: 4rem 0 2rem;
+  padding: 4.5rem 0 2rem;
 }
 
 .coda-line {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--text-secondary);
-  line-height: 2;
-  margin-bottom: 1.5rem;
+  line-height: 2.1;
+  margin-bottom: 1.75rem;
 }
 
 .coda-line strong {
@@ -664,33 +754,36 @@
 }
 
 .coda-sub {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--text-muted);
-  line-height: 1.8;
+  line-height: 1.85;
   max-width: 550px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 2.25rem;
 }
 
 .coda-final {
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   font-weight: 900;
   color: var(--accent);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
 
 @media (max-width: 740px) {
   .thesis-title {
-    font-size: 2.75rem;
+    font-size: 2.8rem;
   }
 
   .thesis-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
   }
 
   .thesis-section-title {
-    font-size: 1.35rem;
+    font-size: 1.4rem;
   }
 
   .landscape-grid {
@@ -705,7 +798,7 @@
 
   .credo-strip {
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: 0.3rem;
   }
 
   .credo-arrow {
@@ -717,13 +810,13 @@
   }
 
   .credo-word {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .fusion-rule {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.25rem;
+    gap: 0.3rem;
   }
 
   .fusion-arrow {
@@ -731,7 +824,7 @@
   }
 
   .fusion-meaning {
-    padding-left: 0.5rem;
+    padding-left: 0.6rem;
     border-left: 2px solid var(--border);
   }
 
@@ -740,6 +833,6 @@
   }
 
   .coda-final {
-    font-size: 1.35rem;
+    font-size: 1.4rem;
   }
 }
