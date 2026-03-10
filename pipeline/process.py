@@ -580,14 +580,21 @@ def build_time_series(strides):
         pt["running"] = is_running_stride(s)
         points.append(pt)
 
-    # Smoothed pace: rolling average of speed, then convert to min/mile
+    # Apply rolling smooth to all metrics
     SMOOTH_WINDOW = 21
-    raw_speeds = [p.get("speed") for p in points]
-    smoothed = _rolling_smooth(raw_speeds, SMOOTH_WINDOW)
-    for i, p in enumerate(points):
-        s = smoothed[i]
+    SMOOTH_KEYS = ["speed", "gct", "cadence", "fsa", "vgrf", "vgrf_peak", "lr", "stride", "impulse"]
+    for mk in SMOOTH_KEYS:
+        raw = [p.get(mk) for p in points]
+        smoothed = _rolling_smooth(raw, SMOOTH_WINDOW)
+        for i, val in enumerate(smoothed):
+            if val is not None:
+                points[i][mk] = round(val, 3)
+
+    # Pace from smoothed speed
+    for p in points:
+        s = p.get("speed")
         if s and s > 0.3:
-            p["pace"] = round(26.8224 / s, 2)  # min per mile
+            p["pace"] = round(26.8224 / s, 2)
         else:
             p["pace"] = None
 
