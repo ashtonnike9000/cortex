@@ -631,7 +631,7 @@ function SessionExplorer({ athlete }) {
   const unit = useContext(UnitCtx);
   const sessions = athlete.sessions || [];
   const [selectedIdx, setSelectedIdx] = useState(sessions.length - 1);
-  const [activeMetrics, setActiveMetrics] = useState(["speed", "gct"]);
+  const [activeMetrics, setActiveMetrics] = useState(["pace", "gct"]);
   const [distRange, setDistRange] = useState(null);
   const [runOnly, setRunOnly] = useState(true);
 

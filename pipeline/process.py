@@ -531,6 +531,20 @@ def build_bilateral(left, right):
     return rows
 
 
+def _rolling_smooth(values, window):
+    """Apply centered rolling average, handling None values."""
+    n = len(values)
+    out = [None] * n
+    half = window // 2
+    for i in range(n):
+        lo = max(0, i - half)
+        hi = min(n, i + half + 1)
+        chunk = [v for v in values[lo:hi] if v is not None]
+        if chunk:
+            out[i] = sum(chunk) / len(chunk)
+    return out
+
+
 def build_time_series(strides):
     """Build dense time-series with cumulative distance. Targets ~600-800 points."""
     if not strides:
@@ -538,11 +552,7 @@ def build_time_series(strides):
     ss = sorted(strides, key=lambda s: ts_sort_key(s.get("timestamp")))
     target = 700
     step = max(1, len(ss) // target)
-    sm = ss[::step]
 
-    cum_dist = 0.0
-    points = []
-    # Pre-compute cumulative distance across ALL sorted strides, then sample
     distances = []
     d = 0.0
     for s in ss:
@@ -551,6 +561,7 @@ def build_time_series(strides):
             d += sl
         distances.append(d)
 
+    points = []
     for i in range(0, len(ss), step):
         s = ss[i]
         pt = {
@@ -568,6 +579,18 @@ def build_time_series(strides):
         pt["foot"] = s.get("foot", "unknown")
         pt["running"] = is_running_stride(s)
         points.append(pt)
+
+    # Smoothed pace: rolling average of speed, then convert to min/mile
+    SMOOTH_WINDOW = 21
+    raw_speeds = [p.get("speed") for p in points]
+    smoothed = _rolling_smooth(raw_speeds, SMOOTH_WINDOW)
+    for i, p in enumerate(points):
+        s = smoothed[i]
+        if s and s > 0.3:
+            p["pace"] = round(26.8224 / s, 2)  # min per mile
+        else:
+            p["pace"] = None
+
     return points
 
 
