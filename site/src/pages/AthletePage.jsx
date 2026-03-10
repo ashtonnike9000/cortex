@@ -5,8 +5,8 @@ import { fetchAthlete } from "../api";
 import InteractiveSessionChart from "../components/charts/InteractiveSessionChart";
 import SessionOverlayChart from "../components/charts/SessionOverlayChart";
 import MileSplitsChart from "../components/charts/MileSplitsChart";
-import TrendPlot from "../components/charts/TrendPlot";
-import LoadChart from "../components/charts/LoadChart";
+// import TrendPlot from "../components/charts/TrendPlot";
+// import LoadChart from "../components/charts/LoadChart";
 import BilateralTable from "../components/charts/BilateralTable";
 import SpeedZonesTable from "../components/charts/SpeedZonesTable";
 import FatiguePanel from "../components/charts/FatiguePanel";
@@ -130,8 +130,6 @@ export default function AthletePage() {
           <FootwearComparison athlete={athlete} />
           <FatigueProfile athlete={athlete} />
           <SessionCompare athlete={athlete} />
-          <LoadTracking athlete={athlete} />
-          <SessionTrends athlete={athlete} />
           <DetailDrawer athlete={athlete} />
           <SessionHistory athlete={athlete} />
         </div>
