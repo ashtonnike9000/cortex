@@ -5,22 +5,30 @@ import Plotly from "plotly.js-dist-min";
 const Plot = createPlotlyComponent(Plotly);
 
 const METRIC_DEFS = [
-  { key: "speed", label: "Speed", unit: "m/s", color: "#CDFF00", axis: "y" },
-  { key: "gct", label: "GCT", unit: "ms", color: "#30d158", axis: "y2" },
-  { key: "cadence", label: "Cadence", unit: "spm", color: "#ffd60a", axis: "y3" },
-  { key: "vgrf_peak", label: "vGRF Peak", unit: "BW", color: "#ff453a", axis: "y4" },
-  { key: "fsa", label: "FSA", unit: "°", color: "#64d2ff", axis: "y5" },
-  { key: "stride", label: "Stride Len", unit: "m", color: "#bf5af2", axis: "y6" },
-  { key: "lr", label: "Loading Rate", unit: "BW/s", color: "#ff9f0a", axis: "y7" },
+  { key: "pace", label: "Pace", unit: "min/mi", color: "#CDFF00", axis: "y", invert: true },
+  { key: "speed", label: "Speed (raw)", unit: "m/s", color: "#8aab00", axis: "y2" },
+  { key: "gct", label: "GCT", unit: "ms", color: "#30d158", axis: "y3" },
+  { key: "cadence", label: "Cadence", unit: "spm", color: "#ffd60a", axis: "y4" },
+  { key: "vgrf_peak", label: "vGRF Peak", unit: "BW", color: "#ff453a", axis: "y5" },
+  { key: "fsa", label: "FSA", unit: "°", color: "#64d2ff", axis: "y6" },
+  { key: "stride", label: "Stride Len", unit: "m", color: "#bf5af2", axis: "y7" },
+  { key: "lr", label: "Loading Rate", unit: "BW/s", color: "#ff9f0a", axis: "y8" },
 ];
 
 const PLOTLY_BG = "rgba(0,0,0,0)";
 const GRID_COLOR = "rgba(255,255,255,0.04)";
 const TEXT_COLOR = "#48484a";
 
+function fmtPace(minPerMile) {
+  if (minPerMile == null || minPerMile <= 0) return "";
+  const m = Math.floor(minPerMile);
+  const s = Math.round((minPerMile - m) * 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 export default function InteractiveSessionChart({
   timeSeries,
-  activeMetrics = ["speed", "gct"],
+  activeMetrics = ["pace", "gct"],
   onToggleMetric,
   onRangeChange,
   height = 380,
@@ -30,17 +38,27 @@ export default function InteractiveSessionChart({
   const traces = useMemo(() => {
     return METRIC_DEFS
       .filter((m) => activeMetrics.includes(m.key))
-      .map((m, i) => ({
-        x: xVals,
-        y: timeSeries.map((p) => p[m.key] ?? null),
-        type: "scattergl",
-        mode: "lines",
-        name: `${m.label} (${m.unit})`,
-        yaxis: i === 0 ? "y" : `y${i + 1}`,
-        line: { color: m.color, width: 1.5 },
-        hovertemplate: `%{y:.2f} ${m.unit}<extra>${m.label}</extra>`,
-        connectgaps: false,
-      }));
+      .map((m, i) => {
+        const yData = timeSeries.map((p) => p[m.key] ?? null);
+        const isPace = m.key === "pace";
+        return {
+          x: xVals,
+          y: yData,
+          type: "scattergl",
+          mode: "lines",
+          name: `${m.label} (${m.unit})`,
+          yaxis: i === 0 ? "y" : `y${i + 1}`,
+          line: { color: m.color, width: isPace ? 2.5 : 1.5 },
+          hovertemplate: isPace
+            ? yData.map((v) => `${fmtPace(v)} /mi<extra>Pace</extra>`).join("")
+            : `%{y:.2f} ${m.unit}<extra>${m.label}</extra>`,
+          ...(isPace ? {
+            text: yData.map((v) => fmtPace(v)),
+            hovertemplate: "%{text} /mi<extra>Pace</extra>",
+          } : {}),
+          connectgaps: false,
+        };
+      });
   }, [timeSeries, activeMetrics, xVals]);
 
   const layout = useMemo(() => {
@@ -56,6 +74,7 @@ export default function InteractiveSessionChart({
         overlaying: i === 0 ? undefined : "y",
         showgrid: i === 0,
         zeroline: false,
+        ...(m.invert ? { autorange: "reversed" } : {}),
         ...(i >= 2 ? { anchor: "free", position: i % 2 === 0 ? 0 : 1 } : {}),
       };
     });
