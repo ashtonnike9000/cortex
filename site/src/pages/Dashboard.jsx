@@ -40,8 +40,8 @@ export default function Dashboard() {
         <FleetStat value={f.total_athletes} label="Athletes" />
         <FleetStat value={f.total_sessions} label="Sessions" />
         <FleetStat value={f.total_strides?.toLocaleString()} label="Total Strides" />
-        <FleetStat value={f.avg_gct_ms?.toFixed(0)} label="Fleet GCT" unit="ms" />
-        <FleetStat value={f.avg_speed_mps?.toFixed(2)} label="Fleet Speed" unit="m/s" />
+        <FleetStat value={f.avg_gct_ms?.toFixed(0)} label="Pack GCT" unit="ms" />
+        <FleetStat value={f.avg_speed_mps?.toFixed(2)} label="Pack Speed" unit="m/s" />
       </div>
 
       {/* Needs Attention */}
@@ -77,7 +77,7 @@ export default function Dashboard() {
         <section className="dash-section">
           <h2 className="dash-section-title">
             <span className="attention-dot" />
-            Fleet Watch List
+            Pack Watch List
             <span className="dash-section-count">{fleetWatch.length}</span>
           </h2>
           <div className="fleet-watch-items">
@@ -179,7 +179,7 @@ const CATEGORY_CONFIG = {
   mechanics: { label: "Mechanics", color: "var(--cyan)" },
   asymmetry: { label: "Asymmetry", color: "var(--amber)" },
   pattern: { label: "Shared Pattern", color: "var(--red)" },
-  fleet: { label: "Fleet", color: "var(--text-muted)" },
+  fleet: { label: "Pack", color: "var(--text-muted)" },
   training: { label: "Training", color: "var(--green)" },
 };
 
@@ -198,13 +198,13 @@ function FleetSynthesis({ synthesis }) {
     <section className="dash-section synthesis-section">
       <h2 className="dash-section-title">
         <span className="synthesis-dot" />
-        Fleet Synthesis
+        Pack Synthesis
         <span className="dash-section-count">{synthesis.length} insights</span>
       </h2>
       <p className="synthesis-desc">
         Cross-athlete patterns and relationships. These insights emerge from comparing
-        athletes at the same pace, tracking shared deviations, and analyzing mechanical profiles
-        across the group. They become richer with more athletes and more sessions.
+        runners at the same pace, tracking shared deviations, and analyzing mechanical profiles
+        across the pack. They become richer with more athletes and more sessions.
       </p>
 
       {sortedCategories.map(cat => {

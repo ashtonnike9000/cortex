@@ -266,7 +266,7 @@ function RacePredictions({ athlete }) {
       <p className="section-desc">
         Estimated from {inputs.n_sessions_analyzed} sessions and {inputs.n_mile_splits_analyzed} mile
         splits, adjusted for biomechanical efficiency and fatigue resistance.
-        <a href="/cortex/models" className="models-link"> See full methodology →</a>
+        <Link to="/models" className="models-link"> See full methodology →</Link>
       </p>
       {conf?.reasons?.length > 0 && (
         <div className="confidence-reasons">

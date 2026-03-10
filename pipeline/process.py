@@ -853,8 +853,8 @@ def generate_fleet_synthesis(athletes, rows):
         synthesis.append({
             "category": "fleet",
             "severity": "info",
-            "title": "Building your fleet",
-            "text": f"With {n} athlete{'s' if n != 1 else ''} in the system, individual analysis is available. Cross-athlete patterns, trends, and relationships will emerge as more athletes are added. Even 3-4 athletes reveal meaningful population-level signals.",
+            "title": "Building your pack",
+            "text": f"With {n} athlete{'s' if n != 1 else ''} in the system, individual analysis is available. Cross-runner patterns, trends, and relationships will emerge as more athletes are added. Even 3-4 runners reveal meaningful pack-level signals.",
         })
         return synthesis
 
@@ -930,7 +930,7 @@ def generate_fleet_synthesis(athletes, rows):
             synthesis.append({
                 "category": "asymmetry",
                 "severity": "notable" if highest[1] > 10 else "info",
-                "title": f"Asymmetry range: {lowest[1]:.1f}ms to {highest[1]:.1f}ms across fleet",
+                "title": f"Asymmetry range: {lowest[1]:.1f}ms to {highest[1]:.1f}ms across the pack",
                 "text": f"{highest[0]} shows the most bilateral asymmetry at {highest[1]:.1f}ms, while {lowest[0]} is most symmetric at {lowest[1]:.1f}ms. {'This spread suggests different injury histories or structural differences between athletes.' if highest[1] > 10 else 'Both are within acceptable ranges, but the difference highlights individual variation.'} Tracking each athlete against their own baseline matters more than comparing between athletes — a 5ms asymmetry that's consistent is less concerning than a sudden 3ms shift.",
                 "athletes": [d[0] for d in asym_data],
             })
@@ -979,8 +979,8 @@ def generate_fleet_synthesis(athletes, rows):
         synthesis.append({
             "category": "fleet",
             "severity": "notable" if status_counts["check_in"] > n * 0.5 else "info",
-            "title": f"Fleet status: {', '.join(parts)}",
-            "text": f"Across {n} athletes and {sum(a['session_count'] for a in athletes)} total sessions, {status_counts['on_track']} {'is' if status_counts['on_track'] == 1 else 'are'} operating within their personal baselines. {'A majority showing deviations may indicate a shared stressor or a particularly demanding training period.' if status_counts['check_in'] > n * 0.5 else 'Individual deviations are normal — the question is whether patterns cluster across the group.'}",
+            "title": f"Pack status: {', '.join(parts)}",
+            "text": f"Across {n} runners and {sum(a['session_count'] for a in athletes)} total sessions, {status_counts['on_track']} {'is' if status_counts['on_track'] == 1 else 'are'} operating within their personal baselines. {'A majority showing deviations may indicate a shared stressor or a particularly demanding training period.' if status_counts['check_in'] > n * 0.5 else 'Individual deviations are normal — the question is whether patterns cluster across the pack.'}",
         })
 
     # -------------------------------------------------------------------
@@ -1000,8 +1000,8 @@ def generate_fleet_synthesis(athletes, rows):
             synthesis.append({
                 "category": "mechanics",
                 "severity": "info",
-                "title": "Mixed foot strike patterns across fleet",
-                "text": f"Athletes show different foot strike strategies: {', '.join(parts)}. Different strike patterns aren't better or worse — they interact with individual anatomy, speed, and injury history. Tracking how each athlete's pattern shifts with pace and fatigue provides more insight than comparing patterns between athletes.",
+                "title": "Mixed foot strike patterns across the pack",
+                "text": f"Runners show different foot strike strategies: {', '.join(parts)}. Different strike patterns aren't better or worse — they interact with individual anatomy, speed, and injury history. Tracking how each runner's pattern shifts with pace and fatigue provides more insight than comparing patterns between athletes.",
                 "athletes": [d["name"] for d in fsa_data],
             })
 
