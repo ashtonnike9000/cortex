@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef, createContext, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { fetchAthlete } from "../api";
 import InteractiveSessionChart from "../components/charts/InteractiveSessionChart";
 import SessionOverlayChart from "../components/charts/SessionOverlayChart";
@@ -9,7 +9,59 @@ import LoadChart from "../components/charts/LoadChart";
 import BilateralTable from "../components/charts/BilateralTable";
 import SpeedZonesTable from "../components/charts/SpeedZonesTable";
 import FatiguePanel from "../components/charts/FatiguePanel";
+import { SHOES } from "../data/shoes";
 import "./AthletePage.css";
+
+// ---------------------------------------------------------------------------
+// Shoe assignment helpers (localStorage-backed)
+// ---------------------------------------------------------------------------
+
+const SHOE_STORAGE_KEY = "cortex_shoe_assignments";
+
+function loadShoeAssignments() {
+  try { return JSON.parse(localStorage.getItem(SHOE_STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function saveShoeAssignments(data) {
+  localStorage.setItem(SHOE_STORAGE_KEY, JSON.stringify(data));
+}
+
+function sessionKey(athleteId, session) {
+  return `${athleteId}::${session.date}::${session.label || session.source || ""}`;
+}
+
+function useShoeAssignments(athleteId, sessions) {
+  const [assignments, setAssignments] = useState(() => loadShoeAssignments());
+
+  const assign = useCallback((session, shoeId) => {
+    setAssignments((prev) => {
+      const key = sessionKey(athleteId, session);
+      const next = { ...prev, [key]: shoeId || null };
+      if (!shoeId) delete next[key];
+      saveShoeAssignments(next);
+      return next;
+    });
+  }, [athleteId]);
+
+  const getShoe = useCallback((session) => {
+    const key = sessionKey(athleteId, session);
+    return assignments[key] || null;
+  }, [athleteId, assignments]);
+
+  const usedShoes = useMemo(() => {
+    const shoes = new Set();
+    for (const s of sessions) {
+      const sid = getShoe(s);
+      if (sid) shoes.add(sid);
+    }
+    return [...shoes];
+  }, [sessions, getShoe]);
+
+  return { assign, getShoe, usedShoes };
+}
+
+const ShoeCtx = createContext({ assign: () => {}, getShoe: () => null, usedShoes: [] });
 
 const STATUS_CONFIG = {
   on_track: { label: "ON TRACK", color: "var(--green)", bg: "var(--green-dim)", icon: "●" },
@@ -53,31 +105,36 @@ export default function AthletePage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const shoeCtx = useShoeAssignments(id, athlete?.sessions || []);
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!athlete) return <div className="error">Athlete not found</div>;
 
   return (
     <UnitCtx.Provider value={unit}>
-      <div className="unit-toggle-bar">
-        <button className="unit-toggle" onClick={() => setUnit((u) => (u === "mps" ? "mph" : "mps"))}>
-          <span className={unit === "mps" ? "ut-active" : ""}>m/s</span>
-          <span className="ut-sep">/</span>
-          <span className={unit === "mph" ? "ut-active" : ""}>mph</span>
-        </button>
-      </div>
-      <div className="athlete-page">
-        <StatusBanner athlete={athlete} />
-        <WatchList athlete={athlete} />
-        <RacePredictions athlete={athlete} />
-        <SessionExplorer athlete={athlete} />
-        <FatigueProfile athlete={athlete} />
-        <SessionCompare athlete={athlete} />
-        <LoadTracking athlete={athlete} />
-        <SessionTrends athlete={athlete} />
-        <DetailDrawer athlete={athlete} />
-        <SessionHistory athlete={athlete} />
-      </div>
+      <ShoeCtx.Provider value={shoeCtx}>
+        <div className="unit-toggle-bar">
+          <button className="unit-toggle" onClick={() => setUnit((u) => (u === "mps" ? "mph" : "mps"))}>
+            <span className={unit === "mps" ? "ut-active" : ""}>m/s</span>
+            <span className="ut-sep">/</span>
+            <span className={unit === "mph" ? "ut-active" : ""}>mph</span>
+          </button>
+        </div>
+        <div className="athlete-page">
+          <StatusBanner athlete={athlete} />
+          <WatchList athlete={athlete} />
+          <RacePredictions athlete={athlete} />
+          <SessionExplorer athlete={athlete} />
+          <FootwearComparison athlete={athlete} />
+          <FatigueProfile athlete={athlete} />
+          <SessionCompare athlete={athlete} />
+          <LoadTracking athlete={athlete} />
+          <SessionTrends athlete={athlete} />
+          <DetailDrawer athlete={athlete} />
+          <SessionHistory athlete={athlete} />
+        </div>
+      </ShoeCtx.Provider>
     </UnitCtx.Provider>
   );
 }
@@ -314,6 +371,53 @@ function FatigueProfile({ athlete }) {
 // SESSION CALENDAR — visual date picker
 // ==========================================================================
 
+function SessionShoeTag({ session }) {
+  const { assign, getShoe } = useContext(ShoeCtx);
+  const [open, setOpen] = useState(false);
+  const currentShoe = getShoe(session);
+  const shoe = currentShoe ? SHOES[currentShoe] : null;
+
+  const allShoes = Object.values(SHOES);
+  const everyday = allShoes.filter((s) => s.category === "everyday");
+  const racing = allShoes.filter((s) => s.category === "racing");
+
+  return (
+    <div className="session-shoe-tag">
+      <button className={`sst-btn ${shoe ? "sst-assigned" : ""}`} onClick={() => setOpen(!open)}>
+        {shoe ? shoe.name : "Assign shoe"}
+      </button>
+      {open && (
+        <div className="sst-dropdown">
+          <button className="sst-option sst-none" onClick={() => { assign(session, null); setOpen(false); }}>
+            No shoe
+          </button>
+          <div className="sst-group-label">Everyday</div>
+          {everyday.map((s) => (
+            <button
+              key={s.id}
+              className={`sst-option ${currentShoe === s.id ? "sst-active" : ""}`}
+              onClick={() => { assign(session, s.id); setOpen(false); }}
+            >
+              {s.name} <span className="sst-weight">{s.weight_g}g</span>
+            </button>
+          ))}
+          <div className="sst-group-label">Racing</div>
+          {racing.map((s) => (
+            <button
+              key={s.id}
+              className={`sst-option ${currentShoe === s.id ? "sst-active" : ""}`}
+              onClick={() => { assign(session, s.id); setOpen(false); }}
+            >
+              {s.name} <span className="sst-weight">{s.weight_g}g</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRunOnly, session, pace, speed, unit }) {
   const calRef = useRef(null);
 
@@ -449,12 +553,8 @@ function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRun
             <span className="sps-filtered">{session.n_filtered_out} filtered</span>
           </>
         )}
-        {session.source && (
-          <>
-            <span className="sps-sep">·</span>
-            <span className="sps-source">{session.source}</span>
-          </>
-        )}
+        <span className="sps-sep">·</span>
+        <SessionShoeTag session={session} />
       </div>
     </div>
   );
@@ -578,6 +678,276 @@ function SessionExplorer({ athlete }) {
         </div>
       )}
     </section>
+  );
+}
+
+
+// ==========================================================================
+// FOOTWEAR COMPARISON — real metrics per shoe
+// ==========================================================================
+
+const FW_METRICS = [
+  { key: "avg_speed_mps", label: "Speed", unit: "m/s", higherBetter: true, decimals: 2 },
+  { key: "avg_gct_ms", label: "GCT", unit: "ms", higherBetter: false, decimals: 0 },
+  { key: "avg_cadence_spm", label: "Cadence", unit: "spm", higherBetter: true, decimals: 0 },
+  { key: "avg_stride_len_m", label: "Stride", unit: "m", higherBetter: true, decimals: 3 },
+  { key: "avg_vgrf_peak_bw", label: "vGRF", unit: "BW", higherBetter: false, decimals: 2 },
+  { key: "avg_fsa_deg", label: "FSA", unit: "°", higherBetter: false, decimals: 1 },
+  { key: "avg_loading_rate", label: "Load Rate", unit: "BW/s", higherBetter: false, decimals: 1 },
+];
+
+const SHOE_COLORS = ["#cdff00", "#00d4ff", "#ff6b6b", "#a78bfa", "#fb923c", "#34d399", "#f472b6", "#fbbf24"];
+
+function FootwearComparison({ athlete }) {
+  const { getShoe, usedShoes } = useContext(ShoeCtx);
+  const unit = useContext(UnitCtx);
+  const sessions = athlete.sessions || [];
+  const [activeMetric, setActiveMetric] = useState("avg_speed_mps");
+
+  const shoeGroups = useMemo(() => {
+    const groups = {};
+    for (const s of sessions) {
+      const sid = getShoe(s);
+      if (!sid) continue;
+      if (!groups[sid]) groups[sid] = { shoe: SHOES[sid], sessions: [] };
+      groups[sid].sessions.push(s);
+    }
+    return groups;
+  }, [sessions, getShoe]);
+
+  const shoeIds = Object.keys(shoeGroups);
+  if (shoeIds.length === 0) {
+    return (
+      <section className="v4-section fw-section">
+        <h2 className="section-heading">Footwear Comparison</h2>
+        <div className="fw-empty">
+          <div className="fw-empty-icon">👟</div>
+          <p>Assign shoes to sessions using the shoe picker in the calendar above, then come back here to compare performance across your rotation.</p>
+          <Link to="/shoes" className="fw-lab-link">Browse Shoe Lab →</Link>
+        </div>
+      </section>
+    );
+  }
+
+  const shoeStats = useMemo(() => {
+    return shoeIds.map((sid, i) => {
+      const g = shoeGroups[sid];
+      const shoe = g.shoe;
+      const sArr = g.sessions;
+      const stats = {};
+      for (const def of FW_METRICS) {
+        const vals = sArr.map((s) => s.metrics?.[def.key]).filter((v) => v != null);
+        if (vals.length) {
+          stats[def.key] = {
+            avg: vals.reduce((a, b) => a + b, 0) / vals.length,
+            min: Math.min(...vals),
+            max: Math.max(...vals),
+            n: vals.length,
+          };
+        }
+      }
+      const totalDist = sArr.reduce((a, s) => a + (s.distance_mi || 0), 0);
+      return {
+        id: sid,
+        shoe,
+        sessions: sArr,
+        sessionCount: sArr.length,
+        totalDistance: totalDist,
+        stats,
+        color: SHOE_COLORS[i % SHOE_COLORS.length],
+      };
+    });
+  }, [shoeIds, shoeGroups]);
+
+  const metricDef = FW_METRICS.find((d) => d.key === activeMetric) || FW_METRICS[0];
+  const allVals = shoeStats.flatMap((s) => {
+    const st = s.stats[activeMetric];
+    return st ? [st.avg] : [];
+  });
+  const maxVal = Math.max(...allVals, 0.001);
+  const best = metricDef.higherBetter ? Math.max(...allVals) : Math.min(...allVals);
+
+  return (
+    <section className="v4-section fw-section">
+      <div className="section-heading-row">
+        <h2 className="section-heading">Footwear Comparison</h2>
+        <Link to="/shoes" className="fw-lab-link-inline">Shoe Lab →</Link>
+      </div>
+      <p className="section-desc">
+        Real performance data from {shoeStats.reduce((a, s) => a + s.sessionCount, 0)} sessions across {shoeIds.length} shoes.
+        Select a metric to compare.
+      </p>
+
+      <div className="fw-pills">
+        {FW_METRICS.map((d) => (
+          <button
+            key={d.key}
+            className={`fw-pill ${activeMetric === d.key ? "active" : ""}`}
+            onClick={() => setActiveMetric(d.key)}
+          >
+            {d.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="fw-comparison">
+        {shoeStats.map((ss) => {
+          const st = ss.stats[activeMetric];
+          if (!st) return null;
+          const pct = (st.avg / maxVal) * 100;
+          const isBest = Math.abs(st.avg - best) < 0.001;
+          const hasPlate = !!ss.shoe?.plate?.includes("carbon");
+
+          return (
+            <div key={ss.id} className={`fw-shoe-row ${isBest ? "fw-best" : ""}`} style={{ "--fw-color": ss.color }}>
+              <div className="fw-shoe-info">
+                <div className="fw-shoe-name">{ss.shoe?.name || ss.id}</div>
+                <div className="fw-shoe-meta">
+                  {ss.sessionCount} run{ss.sessionCount !== 1 ? "s" : ""} · {ss.totalDistance.toFixed(1)} mi
+                  {hasPlate && <span className="fw-plate-tag">Carbon</span>}
+                </div>
+              </div>
+              <div className="fw-bar-area">
+                <div className="fw-bar-track">
+                  <div className="fw-bar" style={{ width: `${Math.max(5, pct)}%` }}>
+                    <span className="fw-bar-val">
+                      {st.avg.toFixed(metricDef.decimals)} {metricDef.unit}
+                    </span>
+                  </div>
+                </div>
+                <div className="fw-range">
+                  {st.min.toFixed(metricDef.decimals)} – {st.max.toFixed(metricDef.decimals)}
+                </div>
+              </div>
+              {isBest && <span className="fw-best-badge">Best</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Shoe spec comparison table */}
+      {shoeIds.length >= 2 && (
+        <div className="fw-spec-table">
+          <h3 className="fw-spec-title">Shoe Specs vs. Performance</h3>
+          <table className="fw-table">
+            <thead>
+              <tr>
+                <th>Shoe</th>
+                <th>Weight</th>
+                <th>Stack</th>
+                <th>Drop</th>
+                <th>Plate</th>
+                <th>Avg Speed</th>
+                <th>Avg GCT</th>
+                <th>Avg Cadence</th>
+                <th>Sessions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shoeStats.map((ss) => (
+                <tr key={ss.id} style={{ "--fw-color": ss.color }}>
+                  <td className="fw-td-name">{ss.shoe?.name}</td>
+                  <td>{ss.shoe?.weight_g}g</td>
+                  <td>{ss.shoe?.stack_heel_mm}/{ss.shoe?.stack_forefoot_mm}</td>
+                  <td>{ss.shoe?.drop_mm}mm</td>
+                  <td>{ss.shoe?.plate?.includes("carbon") ? "✓" : "—"}</td>
+                  <td className="fw-td-metric">{ss.stats.avg_speed_mps?.avg.toFixed(2) || "—"}</td>
+                  <td className="fw-td-metric">{ss.stats.avg_gct_ms?.avg.toFixed(0) || "—"}</td>
+                  <td className="fw-td-metric">{ss.stats.avg_cadence_spm?.avg.toFixed(0) || "—"}</td>
+                  <td>{ss.sessionCount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Insights */}
+      {shoeIds.length >= 2 && (
+        <FootwearInsights shoeStats={shoeStats} />
+      )}
+    </section>
+  );
+}
+
+function FootwearInsights({ shoeStats }) {
+  const insights = useMemo(() => {
+    const result = [];
+    if (shoeStats.length < 2) return result;
+
+    const bySpeed = [...shoeStats].filter((s) => s.stats.avg_speed_mps).sort((a, b) => b.stats.avg_speed_mps.avg - a.stats.avg_speed_mps.avg);
+    if (bySpeed.length >= 2) {
+      const fastest = bySpeed[0];
+      const slowest = bySpeed[bySpeed.length - 1];
+      const diff = fastest.stats.avg_speed_mps.avg - slowest.stats.avg_speed_mps.avg;
+      const pct = (diff / slowest.stats.avg_speed_mps.avg * 100).toFixed(1);
+      result.push({
+        title: "Speed Differential",
+        text: `${fastest.shoe.name} averages ${diff.toFixed(2)} m/s faster than ${slowest.shoe.name} (${pct}% difference). ` +
+              (fastest.shoe?.plate?.includes("carbon") && !slowest.shoe?.plate?.includes("carbon")
+                ? "The carbon plate likely contributes to this gap."
+                : fastest.shoe.weight_g < slowest.shoe.weight_g
+                  ? `The ${fastest.shoe.weight_g - slowest.shoe.weight_g}g weight advantage may be a factor.`
+                  : "This could reflect workout type differences — check if faster sessions were tempo/race efforts."),
+        color: fastest.color,
+      });
+    }
+
+    const byGCT = [...shoeStats].filter((s) => s.stats.avg_gct_ms).sort((a, b) => a.stats.avg_gct_ms.avg - b.stats.avg_gct_ms.avg);
+    if (byGCT.length >= 2) {
+      const shortest = byGCT[0];
+      const longest = byGCT[byGCT.length - 1];
+      const diff = longest.stats.avg_gct_ms.avg - shortest.stats.avg_gct_ms.avg;
+      if (diff > 5) {
+        result.push({
+          title: "Ground Contact Time",
+          text: `${shortest.shoe.name} produces ${diff.toFixed(0)} ms shorter GCT on average. ` +
+                (shortest.shoe.stack_forefoot_mm > longest.shoe.stack_forefoot_mm
+                  ? "Higher forefoot stack may aid faster toe-off."
+                  : "This could be related to the shoe's responsiveness or the type of runs done in it."),
+          color: shortest.color,
+        });
+      }
+    }
+
+    const byCadence = [...shoeStats].filter((s) => s.stats.avg_cadence_spm).sort((a, b) => b.stats.avg_cadence_spm.avg - a.stats.avg_cadence_spm.avg);
+    if (byCadence.length >= 2) {
+      const highest = byCadence[0];
+      const lowest = byCadence[byCadence.length - 1];
+      const diff = highest.stats.avg_cadence_spm.avg - lowest.stats.avg_cadence_spm.avg;
+      if (diff > 3) {
+        result.push({
+          title: "Cadence Effect",
+          text: `Cadence is ${diff.toFixed(0)} spm higher in ${highest.shoe.name}. ` +
+                (highest.shoe.drop_mm < lowest.shoe.drop_mm
+                  ? `The lower ${highest.shoe.drop_mm}mm drop may encourage quicker turnover.`
+                  : highest.shoe.weight_g < lowest.shoe.weight_g
+                    ? "Lighter weight can facilitate higher turnover rate."
+                    : "This may reflect different workout intensities."),
+          color: highest.color,
+        });
+      }
+    }
+
+    return result;
+  }, [shoeStats]);
+
+  if (!insights.length) return null;
+
+  return (
+    <div className="fw-insights">
+      <h3 className="fw-insights-title">What the Data Shows</h3>
+      {insights.map((ins, i) => (
+        <div key={i} className="fw-insight-card" style={{ "--fw-color": ins.color }}>
+          <div className="fwi-title">{ins.title}</div>
+          <div className="fwi-text">{ins.text}</div>
+        </div>
+      ))}
+      <div className="fw-insight-caveat">
+        Shoe-to-shoe comparisons are influenced by workout type, effort level, terrain, and conditions.
+        More sessions per shoe improves reliability. Controlled A/B testing (same route, same effort, different shoes) gives the strongest signal.
+      </div>
+    </div>
   );
 }
 
