@@ -374,43 +374,83 @@ function FatigueProfile({ athlete }) {
 function SessionShoeTag({ session }) {
   const { assign, getShoe } = useContext(ShoeCtx);
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const currentShoe = getShoe(session);
   const shoe = currentShoe ? SHOES[currentShoe] : null;
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
 
   const allShoes = Object.values(SHOES);
   const everyday = allShoes.filter((s) => s.category === "everyday");
   const racing = allShoes.filter((s) => s.category === "racing");
 
   return (
-    <div className="session-shoe-tag">
+    <div className="session-shoe-tag" ref={dropdownRef}>
       <button className={`sst-btn ${shoe ? "sst-assigned" : ""}`} onClick={() => setOpen(!open)}>
-        {shoe ? shoe.name : "Assign shoe"}
+        <span className="sst-shoe-icon">👟</span>
+        {shoe ? (
+          <>
+            <span className="sst-shoe-name">{shoe.name}</span>
+            <span className="sst-shoe-spec">{shoe.weight_g}g · {shoe.drop_mm}mm</span>
+          </>
+        ) : (
+          <span className="sst-placeholder">What shoe was this?</span>
+        )}
+        <span className="sst-chevron">{open ? "▴" : "▾"}</span>
       </button>
       {open && (
         <div className="sst-dropdown">
+          <div className="sst-dd-header">Select Shoe for This Session</div>
           <button className="sst-option sst-none" onClick={() => { assign(session, null); setOpen(false); }}>
-            No shoe
+            Clear selection
           </button>
           <div className="sst-group-label">Everyday</div>
-          {everyday.map((s) => (
-            <button
-              key={s.id}
-              className={`sst-option ${currentShoe === s.id ? "sst-active" : ""}`}
-              onClick={() => { assign(session, s.id); setOpen(false); }}
-            >
-              {s.name} <span className="sst-weight">{s.weight_g}g</span>
-            </button>
-          ))}
+          <div className="sst-grid">
+            {everyday.map((s) => {
+              const hasPlate = !!s.plate?.includes("carbon");
+              return (
+                <button
+                  key={s.id}
+                  className={`sst-card ${currentShoe === s.id ? "sst-card-active" : ""}`}
+                  onClick={() => { assign(session, s.id); setOpen(false); }}
+                >
+                  <div className="sst-card-name">{s.name}</div>
+                  <div className="sst-card-specs">
+                    <span>{s.weight_g}g</span>
+                    <span>{s.drop_mm}mm drop</span>
+                    {hasPlate && <span className="sst-card-plate">C</span>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
           <div className="sst-group-label">Racing</div>
-          {racing.map((s) => (
-            <button
-              key={s.id}
-              className={`sst-option ${currentShoe === s.id ? "sst-active" : ""}`}
-              onClick={() => { assign(session, s.id); setOpen(false); }}
-            >
-              {s.name} <span className="sst-weight">{s.weight_g}g</span>
-            </button>
-          ))}
+          <div className="sst-grid">
+            {racing.map((s) => {
+              const hasPlate = !!s.plate?.includes("carbon");
+              return (
+                <button
+                  key={s.id}
+                  className={`sst-card sst-card-racing ${currentShoe === s.id ? "sst-card-active" : ""}`}
+                  onClick={() => { assign(session, s.id); setOpen(false); }}
+                >
+                  <div className="sst-card-name">{s.name}</div>
+                  <div className="sst-card-specs">
+                    <span>{s.weight_g}g</span>
+                    <span>{s.drop_mm}mm</span>
+                    {hasPlate && <span className="sst-card-plate">C</span>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -819,7 +859,6 @@ function FootwearComparison({ athlete }) {
                   {st.min.toFixed(metricDef.decimals)} – {st.max.toFixed(metricDef.decimals)}
                 </div>
               </div>
-              {isBest && <span className="fw-best-badge">Best</span>}
             </div>
           );
         })}
