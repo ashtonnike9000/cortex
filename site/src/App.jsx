@@ -5,6 +5,7 @@ import ModelsPage from "./pages/ModelsPage";
 import ShoeLab from "./pages/ShoeLab";
 import VisionPage from "./pages/VisionPage";
 import ThesisPage from "./pages/ThesisPage";
+import PitWallPage from "./pages/PitWallPage";
 import Layout from "./components/layout/Layout";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/shoes" element={<ShoeLab />} />
         <Route path="/vision" element={<VisionPage />} />
         <Route path="/thesis" element={<ThesisPage />} />
+        <Route path="/pitwall" element={<PitWallPage />} />
       </Routes>
     </Layout>
   );

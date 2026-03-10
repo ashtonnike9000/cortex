@@ -25,6 +25,9 @@ export default function Layout({ children }) {
           <NavLink to="/thesis" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
             Thesis
           </NavLink>
+          <NavLink to="/pitwall" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+            Pit Wall
+          </NavLink>
         </nav>
       </header>
       <main className="content">{children}</main>
