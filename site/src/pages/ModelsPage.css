@@ -280,9 +280,44 @@
   letter-spacing: -0.02em;
 }
 
+.amc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .amc-session-count {
   font-size: 0.58rem;
   color: var(--text-muted);
+}
+
+.amc-conf {
+  font-size: 0.46rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.amc-conf-warning {
+  background: var(--red-dim);
+  border: 1px solid rgba(255,59,48,0.15);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.amc-conf-reason {
+  font-size: 0.56rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.amc-conf-reason::before {
+  content: "• ";
+  color: var(--amber);
 }
 
 .amc-reason {

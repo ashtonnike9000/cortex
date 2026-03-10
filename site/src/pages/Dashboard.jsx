@@ -23,6 +23,7 @@ export default function Dashboard() {
   const f = summary.fleet;
   const athletes = summary.athletes || [];
   const synthesis = summary.synthesis || [];
+  const fleetWatch = summary.fleet_watch_list || [];
 
   const needsAttention = athletes.filter(a => a.status?.level !== "on_track");
   const onTrack = athletes.filter(a => a.status?.level === "on_track" || !a.status);
@@ -67,6 +68,29 @@ export default function Dashboard() {
           </h2>
           <div className="athlete-cards">
             {onTrack.map(a => <AthleteCard key={a.id} athlete={a} />)}
+          </div>
+        </section>
+      )}
+
+      {/* Fleet Watch List */}
+      {fleetWatch.length > 0 && (
+        <section className="dash-section">
+          <h2 className="dash-section-title">
+            <span className="attention-dot" />
+            Fleet Watch List
+            <span className="dash-section-count">{fleetWatch.length}</span>
+          </h2>
+          <div className="fleet-watch-items">
+            {fleetWatch.map((item, i) => (
+              <Link key={i} to={`/athlete/${item.athlete_id}`} className="fw-item">
+                <div className="fw-top">
+                  <span className="fw-athlete">{item.athlete}</span>
+                  <span className={`fw-sev fw-sev-${item.severity}`}>{item.severity}</span>
+                </div>
+                <div className="fw-title">{item.title}</div>
+                <div className="fw-detail">{item.detail}</div>
+              </Link>
+            ))}
           </div>
         </section>
       )}

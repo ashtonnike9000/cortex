@@ -68,6 +68,7 @@ export default function AthletePage() {
       </div>
       <div className="athlete-page">
         <StatusBanner athlete={athlete} />
+        <WatchList athlete={athlete} />
         <RacePredictions athlete={athlete} />
         <SessionExplorer athlete={athlete} />
         <FatigueProfile athlete={athlete} />
@@ -78,6 +79,55 @@ export default function AthletePage() {
         <SessionHistory athlete={athlete} />
       </div>
     </UnitCtx.Provider>
+  );
+}
+
+
+// ==========================================================================
+// WATCH LIST
+// ==========================================================================
+
+const WATCH_ICONS = {
+  data_quality: "⚠",
+  biomechanics: "⚙",
+  performance: "⚡",
+  trend: "↗",
+};
+const SEVERITY_STYLES = {
+  alert: { color: "var(--red)", bg: "var(--red-dim)", label: "ALERT" },
+  warn: { color: "var(--amber)", bg: "var(--amber-dim)", label: "WARNING" },
+  watch: { color: "var(--cyan)", bg: "rgba(0,200,255,0.06)", label: "WATCH" },
+  info: { color: "var(--text-muted)", bg: "var(--bg-elevated)", label: "INFO" },
+};
+
+function WatchList({ athlete }) {
+  const items = athlete.watch_list;
+  if (!items?.length) return null;
+
+  return (
+    <section className="v4-section watch-list-section">
+      <h2 className="section-heading">Things to Watch</h2>
+      <p className="section-desc">
+        Data quality flags, biomechanical patterns, and trends that may need attention.
+      </p>
+      <div className="watch-items">
+        {items.map((item, i) => {
+          const sev = SEVERITY_STYLES[item.severity] || SEVERITY_STYLES.info;
+          const icon = WATCH_ICONS[item.type] || "●";
+          return (
+            <div key={i} className="watch-item" style={{ "--wi-color": sev.color, "--wi-bg": sev.bg }}>
+              <div className="wi-header">
+                <span className="wi-icon">{icon}</span>
+                <span className="wi-title">{item.title}</span>
+                <span className="wi-badge">{sev.label}</span>
+              </div>
+              <div className="wi-detail">{item.detail}</div>
+              {item.action && <div className="wi-action">{item.action}</div>}
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -142,15 +192,30 @@ function RacePredictions({ athlete }) {
 
   const preds = rp.predictions;
   const inputs = rp.model_inputs;
+  const conf = rp.confidence;
+  const confColor = conf?.level === "good" ? "var(--green)" : conf?.level === "moderate" ? "var(--amber)" : "var(--red)";
 
   return (
     <section className="v4-section">
-      <h2 className="section-heading">Predicted Race Times</h2>
+      <div className="section-heading-row">
+        <h2 className="section-heading">Predicted Race Times</h2>
+        {conf && (
+          <span className="confidence-badge" style={{ "--conf-color": confColor }}>
+            <span className="cb-dot" />
+            {conf.label} confidence
+          </span>
+        )}
+      </div>
       <p className="section-desc">
         Estimated from {inputs.n_sessions_analyzed} sessions and {inputs.n_mile_splits_analyzed} mile
         splits, adjusted for biomechanical efficiency and fatigue resistance.
         <a href="/cortex/models" className="models-link"> See full methodology →</a>
       </p>
+      {conf?.reasons?.length > 0 && (
+        <div className="confidence-reasons">
+          {conf.reasons.map((r, i) => <span key={i} className="conf-reason">{r}</span>)}
+        </div>
+      )}
       <div className="race-cards">
         {Object.entries(preds).map(([name, p]) => (
           <div key={name} className="race-card">
@@ -246,6 +311,147 @@ function FatigueProfile({ athlete }) {
 
 
 // ==========================================================================
+// SESSION CALENDAR — visual date picker
+// ==========================================================================
+
+function SessionCalendar({ sessions, selectedIdx, onSelect, runOnly, onToggleRunOnly, session, pace, speed, unit }) {
+  const sessionsByDate = useMemo(() => {
+    const map = {};
+    sessions.forEach((s, i) => {
+      map[s.date] = map[s.date] || [];
+      map[s.date].push(i);
+    });
+    return map;
+  }, [sessions]);
+
+  const months = useMemo(() => {
+    if (!sessions.length) return [];
+    const dates = sessions.map((s) => s.date).filter((d) => /^\d{4}-\d{2}/.test(d));
+    if (!dates.length) return [];
+
+    const first = dates[0];
+    const last = dates[dates.length - 1];
+    const [fy, fm] = first.split("-").map(Number);
+    const [ly, lm] = last.split("-").map(Number);
+
+    const result = [];
+    let y = fy, m = fm;
+    while (y < ly || (y === ly && m <= lm)) {
+      result.push({ year: y, month: m });
+      m++;
+      if (m > 12) { m = 1; y++; }
+    }
+    return result;
+  }, [sessions]);
+
+  const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
+  const MONTH_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const selectedDate = session?.date;
+
+  return (
+    <div className="session-picker">
+      <div className="session-picker-top">
+        <label className="session-picker-label">Select a Run</label>
+        <button
+          className={`run-filter-toggle ${runOnly ? "active" : ""}`}
+          onClick={onToggleRunOnly}
+        >
+          <span className="rft-dot" />
+          {runOnly ? "Running only" : "All data"}
+        </button>
+      </div>
+
+      <div className="cal-months">
+        {months.map(({ year, month }) => {
+          const firstDay = new Date(year, month - 1, 1);
+          const daysInMonth = new Date(year, month, 0).getDate();
+          let startDow = firstDay.getDay();
+          startDow = startDow === 0 ? 6 : startDow - 1; // Monday-based
+
+          const cells = [];
+          for (let i = 0; i < startDow; i++) cells.push(null);
+          for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+          return (
+            <div key={`${year}-${month}`} className="cal-month">
+              <div className="cal-month-label">{MONTH_NAMES[month]} {year}</div>
+              <div className="cal-dow-row">
+                {DAYS.map((d, i) => <span key={i} className="cal-dow">{d}</span>)}
+              </div>
+              <div className="cal-grid">
+                {cells.map((day, i) => {
+                  if (day === null) return <span key={i} className="cal-cell cal-empty" />;
+                  const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                  const sessionIdxs = sessionsByDate[dateStr];
+                  const hasSession = !!sessionIdxs;
+                  const isSelected = dateStr === selectedDate;
+
+                  return (
+                    <button
+                      key={i}
+                      className={`cal-cell ${hasSession ? "cal-has-session" : ""} ${isSelected ? "cal-selected" : ""}`}
+                      disabled={!hasSession}
+                      onClick={() => hasSession && onSelect(sessionIdxs[sessionIdxs.length - 1])}
+                      title={hasSession ? `${sessionIdxs.length} session${sessionIdxs.length > 1 ? "s" : ""}` : ""}
+                    >
+                      {day}
+                      {hasSession && <span className="cal-dot" />}
+                      {sessionIdxs?.length > 1 && <span className="cal-multi">{sessionIdxs.length}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Multi-session on same date: show sub-picker */}
+      {sessionsByDate[selectedDate]?.length > 1 && (
+        <div className="cal-sub-picker">
+          {sessionsByDate[selectedDate].map((idx) => {
+            const s = sessions[idx];
+            return (
+              <button
+                key={idx}
+                className={`cal-sub-btn ${idx === selectedIdx ? "active" : ""}`}
+                onClick={() => onSelect(idx)}
+              >
+                {s.distance_mi?.toFixed(2)} mi · {s.n_running_strides ?? s.n_strides} strides
+                {s.source ? ` · ${s.source}` : ""}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="cal-session-summary">
+        <span className="cal-date-badge">{session.date}</span>
+        <span className="sps-stat"><strong>{session.distance_mi?.toFixed(2)}</strong> mi</span>
+        <span className="sps-sep">·</span>
+        <span className="sps-stat"><strong>{pace || formatSpeed(speed, unit)}</strong> {pace ? "pace" : speedUnit(unit)}</span>
+        <span className="sps-sep">·</span>
+        <span className="sps-stat"><strong>{session.n_running_strides ?? session.n_strides}</strong> strides</span>
+        {session.n_filtered_out > 0 && (
+          <>
+            <span className="sps-sep">·</span>
+            <span className="sps-filtered">{session.n_filtered_out} filtered</span>
+          </>
+        )}
+        {session.source && (
+          <>
+            <span className="sps-sep">·</span>
+            <span className="sps-source">{session.source}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// ==========================================================================
 // SESSION EXPLORER — interactive chart + windowed metrics + mile splits
 // ==========================================================================
 
@@ -309,54 +515,17 @@ function SessionExplorer({ athlete }) {
     <section className="v4-section">
       <h2 className="section-heading">Session Explorer</h2>
 
-      <div className="session-picker">
-        <div className="session-picker-top">
-          <label className="session-picker-label">Analyzing Run</label>
-          <button
-            className={`run-filter-toggle ${runOnly ? "active" : ""}`}
-            onClick={() => setRunOnly((v) => !v)}
-            title={runOnly
-              ? `Showing running data only (${session.filter?.min_speed_mps ?? 1.8}–${session.filter?.max_speed_mps ?? 7.0} m/s). Click to show all.`
-              : "Showing all data including walking/noise. Click to filter."}
-          >
-            <span className="rft-dot" />
-            {runOnly ? "Running only" : "All data"}
-          </button>
-        </div>
-        <div className="session-picker-row">
-          <select
-            className="session-picker-select"
-            value={selectedIdx}
-            onChange={(e) => { setSelectedIdx(Number(e.target.value)); setDistRange(null); }}
-          >
-            {sessions.map((s, i) => (
-              <option key={s.date + s.label} value={i}>
-                {s.date} — {s.distance_mi?.toFixed(2)} mi — {s.n_running_strides ?? s.n_strides} strides
-                {s.source ? ` (${s.source})` : ""}
-              </option>
-            ))}
-          </select>
-          <div className="session-picker-summary">
-            <span className="sps-stat"><strong>{session.distance_mi?.toFixed(2)}</strong> mi</span>
-            <span className="sps-sep">·</span>
-            <span className="sps-stat"><strong>{pace || formatSpeed(speed, unit)}</strong> {pace ? "pace" : speedUnit(unit)}</span>
-            <span className="sps-sep">·</span>
-            <span className="sps-stat"><strong>{session.n_running_strides ?? session.n_strides}</strong> strides</span>
-            {session.n_filtered_out > 0 && (
-              <>
-                <span className="sps-sep">·</span>
-                <span className="sps-filtered">{session.n_filtered_out} non-run filtered</span>
-              </>
-            )}
-            {session.source && (
-              <>
-                <span className="sps-sep">·</span>
-                <span className="sps-source">{session.source}</span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+      <SessionCalendar
+        sessions={sessions}
+        selectedIdx={selectedIdx}
+        onSelect={(i) => { setSelectedIdx(i); setDistRange(null); }}
+        runOnly={runOnly}
+        onToggleRunOnly={() => setRunOnly((v) => !v)}
+        session={session}
+        pace={pace}
+        speed={speed}
+        unit={unit}
+      />
 
       {distRange && (
         <div className="range-indicator">

@@ -351,3 +351,211 @@ def _methodology_text(inputs, predictions):
                  "which is typically 5-10% harder than training.")
 
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Confidence assessment
+# ---------------------------------------------------------------------------
+
+def assess_confidence(model_inputs: dict, sessions: list[dict]) -> dict:
+    """Rate prediction confidence based on data quality and quantity."""
+    reasons = []
+    score = 100
+
+    n_splits = model_inputs.get("n_mile_splits_analyzed", 0)
+    n_sessions = model_inputs.get("n_sessions_analyzed", 0)
+
+    if n_sessions < 3:
+        score -= 30
+        reasons.append(f"Only {n_sessions} session{'s' if n_sessions != 1 else ''} with mile splits — need 3+ for reliability")
+    elif n_sessions < 5:
+        score -= 15
+        reasons.append(f"{n_sessions} sessions is a modest sample — 5+ sessions would strengthen predictions")
+
+    if n_splits < 5:
+        score -= 20
+        reasons.append(f"Only {n_splits} total mile splits analyzed — limited data for pace modeling")
+
+    max_dist = max((s.get("distance_mi", 0) for s in sessions), default=0)
+    if max_dist < 3.0:
+        score -= 25
+        reasons.append(f"Longest run is {max_dist:.1f} mi — half marathon predictions are highly speculative without 5+ mi runs")
+    elif max_dist < 5.0:
+        score -= 10
+        reasons.append(f"Longest run is {max_dist:.1f} mi — predictions beyond 10K have extra uncertainty")
+
+    fr = model_inputs.get("fatigue_resistance_score")
+    if fr is None:
+        score -= 15
+        reasons.append("No fatigue data available — using population-average fatigue model")
+
+    # Check for high speed variance (inconsistent effort)
+    speeds = []
+    for s in sessions:
+        m = s.get("metrics", {})
+        spd = m.get("avg_speed_mps")
+        if spd:
+            speeds.append(spd)
+    if len(speeds) >= 2:
+        avg_spd = sum(speeds) / len(speeds)
+        variance = sum((x - avg_spd) ** 2 for x in speeds) / len(speeds)
+        cv = (variance ** 0.5) / avg_spd if avg_spd > 0 else 0
+        if cv > 0.20:
+            score -= 10
+            reasons.append(f"High speed variance across sessions (CV={cv:.0%}) — mixed workout types may skew predictions")
+
+    score = max(0, min(100, score))
+    if score >= 70:
+        level = "good"
+        label = "Good"
+    elif score >= 40:
+        level = "moderate"
+        label = "Moderate"
+    else:
+        level = "low"
+        label = "Low"
+
+    return {
+        "score": score,
+        "level": level,
+        "label": label,
+        "reasons": reasons,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Watch list — actionable insights + data quality alerts
+# ---------------------------------------------------------------------------
+
+def build_watch_list(sessions: list[dict], fatigue_profile: dict,
+                     baseline: dict | None = None, trends: list | None = None) -> list[dict]:
+    """Generate watch list items: things worth paying attention to."""
+    items = []
+
+    # --- Data quality flags ---
+    total_strides = sum(s.get("n_strides", 0) for s in sessions)
+    total_running = sum(s.get("n_running_strides", 0) for s in sessions)
+    total_filtered = total_strides - total_running
+    if total_strides > 0 and total_filtered / total_strides > 0.3:
+        items.append({
+            "type": "data_quality",
+            "severity": "warn",
+            "title": "High non-running data ratio",
+            "detail": f"{total_filtered}/{total_strides} strides ({total_filtered/total_strides:.0%}) were filtered as non-running. "
+                      "This athlete's sessions may include significant walking, standing, or non-run activity.",
+            "action": "Review session data for mixed-activity recordings. Consider separate tracking for run vs. non-run.",
+        })
+
+    for s in sessions:
+        n = s.get("n_strides", 0)
+        nr = s.get("n_running_strides", 0)
+        if n > 0 and nr < 10:
+            items.append({
+                "type": "data_quality",
+                "severity": "alert",
+                "title": f"Minimal running data on {s.get('date', '?')}",
+                "detail": f"Only {nr} of {n} strides classified as running. This session may not be a run.",
+                "action": "Consider excluding this session from run analysis.",
+            })
+
+    # --- Cadence anomalies ---
+    cadences = []
+    for s in sessions:
+        c = s.get("metrics", {}).get("avg_cadence_spm")
+        if c:
+            cadences.append((s.get("date", "?"), c))
+    for date, cad in cadences:
+        if cad < 140:
+            items.append({
+                "type": "biomechanics",
+                "severity": "watch",
+                "title": f"Low cadence on {date}",
+                "detail": f"Average cadence of {cad:.0f} spm is below typical running range (150-190 spm).",
+                "action": "May indicate walking segments mixed in, or an unusually slow/long-stride style.",
+            })
+        elif cad > 210:
+            items.append({
+                "type": "biomechanics",
+                "severity": "watch",
+                "title": f"Very high cadence on {date}",
+                "detail": f"Average cadence of {cad:.0f} spm is above typical range. Could be a sprint session or data anomaly.",
+                "action": "Verify this is a sprint session. If a regular run, check sensor calibration.",
+            })
+
+    # --- GCT asymmetry ---
+    for s in sessions:
+        asym = s.get("metrics", {}).get("gct_asymmetry_pct")
+        if asym is not None and abs(asym) > 8:
+            side = "left" if asym > 0 else "right"
+            items.append({
+                "type": "biomechanics",
+                "severity": "watch",
+                "title": f"GCT asymmetry on {s.get('date', '?')}",
+                "detail": f"{abs(asym):.1f}% longer ground contact on {side} side.",
+                "action": "Persistent asymmetry >8% may warrant gait analysis or injury screening.",
+            })
+
+    # --- Fatigue onset ---
+    if fatigue_profile.get("has_data"):
+        resistance = fatigue_profile.get("resistance_score", 50)
+        if resistance < 40:
+            items.append({
+                "type": "performance",
+                "severity": "watch",
+                "title": "High fatigue rate",
+                "detail": f"Fatigue resistance score of {resistance}/100 indicates significant mechanical degradation over distance.",
+                "action": "Focus on easy-pace long runs to build endurance. Consider strength work for running economy.",
+            })
+
+        gct_onset = fatigue_profile.get("curves", {}).get("avg_gct_ms", {}).get("onset_mile")
+        if gct_onset and gct_onset <= 2:
+            items.append({
+                "type": "performance",
+                "severity": "watch",
+                "title": f"Early fatigue onset (mile {gct_onset})",
+                "detail": "GCT begins degrading within the first 2 miles, suggesting low aerobic base.",
+                "action": "Gradual mileage increase and easy-pace runs can push fatigue onset later.",
+            })
+
+    # --- Baseline deviations ---
+    if baseline and baseline.get("metrics"):
+        bm = baseline["metrics"]
+        for s in sessions[-3:]:
+            sm = s.get("metrics", {})
+            b_gct = bm.get("avg_gct_ms")
+            s_gct = sm.get("avg_gct_ms")
+            if b_gct and s_gct and s_gct > b_gct * 1.10:
+                items.append({
+                    "type": "trend",
+                    "severity": "watch",
+                    "title": f"Elevated GCT on {s.get('date', '?')}",
+                    "detail": f"GCT of {s_gct:.0f} ms is {((s_gct/b_gct)-1)*100:.0f}% above baseline ({b_gct:.0f} ms).",
+                    "action": "Could indicate fatigue accumulation, insufficient recovery, or early overtraining.",
+                })
+
+    # --- Trends worth noting ---
+    if trends:
+        for t in trends:
+            narrative = t.get("narrative", "")
+            if "declining" in narrative.lower() or "dropping" in narrative.lower():
+                items.append({
+                    "type": "trend",
+                    "severity": "info",
+                    "title": t.get("metric", "Trend"),
+                    "detail": narrative,
+                    "action": "Monitor over next 2-3 sessions to confirm trend.",
+                })
+
+    # Deduplicate by title
+    seen = set()
+    unique = []
+    for item in items:
+        if item["title"] not in seen:
+            seen.add(item["title"])
+            unique.append(item)
+
+    # Sort: alert > warn > watch > info
+    severity_order = {"alert": 0, "warn": 1, "watch": 2, "info": 3}
+    unique.sort(key=lambda x: severity_order.get(x["severity"], 9))
+
+    return unique

@@ -311,6 +311,182 @@
   opacity: 0.7;
 }
 
+
+/* ================================================================
+   CALENDAR PICKER
+   ================================================================ */
+
+.cal-months {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cal-month {
+  flex-shrink: 0;
+  min-width: 175px;
+}
+
+.cal-month-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.02em;
+}
+
+.cal-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  margin-bottom: 2px;
+}
+
+.cal-dow {
+  font-size: 0.42rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0.15rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 0.52rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: default;
+  font-family: inherit;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.cal-cell.cal-empty {
+  visibility: hidden;
+}
+
+.cal-cell.cal-has-session {
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cal-cell.cal-has-session:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border);
+}
+
+.cal-cell.cal-selected {
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+}
+
+.cal-cell.cal-selected:hover {
+  background: var(--accent);
+}
+
+.cal-dot {
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.cal-selected .cal-dot {
+  background: #000;
+}
+
+.cal-multi {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 0.38rem;
+  font-weight: 800;
+  color: #000;
+  background: var(--accent);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cal-sub-picker {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.65rem;
+}
+
+.cal-sub-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cal-sub-btn:hover {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.cal-sub-btn.active {
+  background: var(--accent-dim);
+  border-color: rgba(205, 255, 0, 0.12);
+  color: var(--accent);
+}
+
+.cal-session-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.cal-date-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(205, 255, 0, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
 .session-select {
   background: var(--bg-card);
   backdrop-filter: blur(10px);
@@ -705,6 +881,143 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
+}
+
+
+/* ================================================================
+   WATCH LIST
+   ================================================================ */
+
+.watch-list-section {
+  margin-bottom: 0.5rem;
+}
+
+.watch-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.watch-item {
+  background: var(--wi-bg);
+  border: 1px solid color-mix(in srgb, var(--wi-color) 20%, transparent);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.watch-item:hover {
+  border-color: color-mix(in srgb, var(--wi-color) 35%, transparent);
+}
+
+.wi-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.wi-icon {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.wi-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.wi-badge {
+  font-size: 0.42rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--wi-color);
+  background: var(--wi-bg);
+  border: 1px solid color-mix(in srgb, var(--wi-color) 30%, transparent);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.wi-detail {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-left: 1.25rem;
+}
+
+.wi-action {
+  font-size: 0.56rem;
+  color: var(--wi-color);
+  font-weight: 600;
+  margin-left: 1.25rem;
+  margin-top: 0.35rem;
+  padding-left: 0.65rem;
+  border-left: 2px solid color-mix(in srgb, var(--wi-color) 30%, transparent);
+}
+
+
+/* ================================================================
+   CONFIDENCE BADGE + REASONS
+   ================================================================ */
+
+.section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-heading-row .section-heading {
+  margin-bottom: 0;
+}
+
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--conf-color);
+  background: color-mix(in srgb, var(--conf-color) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--conf-color) 20%, transparent);
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.cb-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--conf-color);
+}
+
+.confidence-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.conf-reason {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.conf-reason::before {
+  content: "• ";
+  color: var(--amber);
 }
 
 

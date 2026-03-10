@@ -233,13 +233,29 @@ function AthleteModelCard({ athlete }) {
 
   const preds = rp.predictions;
   const inputs = rp.model_inputs;
+  const conf = rp.confidence;
+  const confColors = { good: "var(--green)", moderate: "var(--amber)", low: "var(--red)" };
+  const confColor = confColors[conf?.level] || "var(--text-muted)";
 
   return (
     <div className="amc-card">
       <div className="amc-header">
         <div className="amc-name">{athlete.name}</div>
-        <div className="amc-session-count">{inputs.n_sessions_analyzed} sessions analyzed</div>
+        <div className="amc-header-right">
+          {conf && (
+            <span className="amc-conf" style={{ color: confColor, borderColor: confColor }}>
+              {conf.label}
+            </span>
+          )}
+          <div className="amc-session-count">{inputs.n_sessions_analyzed} sessions analyzed</div>
+        </div>
       </div>
+
+      {conf?.level === "low" && conf.reasons?.length > 0 && (
+        <div className="amc-conf-warning">
+          {conf.reasons.map((r, i) => <div key={i} className="amc-conf-reason">{r}</div>)}
+        </div>
+      )}
 
       <div className="amc-predictions">
         {Object.entries(preds).map(([name, p]) => (

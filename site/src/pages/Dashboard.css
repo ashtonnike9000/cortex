@@ -511,6 +511,79 @@
 }
 
 
+/* ================================================================
+   FLEET WATCH LIST
+   ================================================================ */
+
+.fleet-watch-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fw-item {
+  display: block;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.fw-item:hover {
+  border-color: var(--border);
+  transform: translateX(2px);
+}
+
+.fw-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.fw-athlete {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.fw-sev {
+  font-size: 0.42rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.fw-sev-alert {
+  color: var(--red);
+  background: var(--red-dim);
+}
+
+.fw-sev-warn {
+  color: var(--amber);
+  background: var(--amber-dim);
+}
+
+.fw-title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.fw-detail {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+
 @media (max-width: 768px) {
   .dash-title {
     font-size: 2rem;

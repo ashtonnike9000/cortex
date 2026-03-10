@@ -164,6 +164,28 @@ def filter_running(strides: list) -> list:
     return [s for s in strides if is_running_stride(s)]
 
 
+def normalize_per_foot_record(rec: dict) -> dict:
+    """Fix per-foot sensor data to standard running metrics.
+
+    Sensors report per-foot values:
+    - stride_len_m is a full gait cycle (same foot to same foot) → halve for step length
+    - cadence is one foot's steps/min → double for true running cadence
+
+    Uses heuristics to avoid double-correcting already-normalized data:
+    - Only halve stride if > 1.8m (clearly a gait cycle, not a step)
+    - Only double cadence if < 120 spm (clearly per-foot, not total)
+    """
+    sl = rec.get("stride_len_m")
+    if sl is not None and not (isinstance(sl, float) and pd.isna(sl)) and sl > 1.8:
+        rec["stride_len_m"] = sl / 2.0
+
+    cad = rec.get("cadence")
+    if cad is not None and not (isinstance(cad, float) and pd.isna(cad)) and cad < 120:
+        rec["cadence"] = cad * 2.0
+
+    return rec
+
+
 # ---------------------------------------------------------------------------
 # CSV readers — return (sessions, all_left, all_right)
 # ---------------------------------------------------------------------------
@@ -191,6 +213,7 @@ def process_nucleus(athlete_dir: Path, source_label: str | None = None):
             recs = df.to_dict("records")
             for r in recs:
                 r["foot"] = foot
+                normalize_per_foot_record(r)
             (left if foot == "left" else right).extend(recs)
         if not left and not right:
             continue
@@ -223,11 +246,13 @@ def process_garmin(athlete_dir: Path, source_label: str | None = None):
             r = row.to_dict()
             if pd.notna(r.get("gct_ms")) and r.get("gct_ms", 0) > 0:
                 r["foot"] = "left"
+                normalize_per_foot_record(r)
                 left.append(r)
         for _, row in right_df.iterrows():
             r = row.to_dict()
             if pd.notna(r.get("gct_ms")) and r.get("gct_ms", 0) > 0:
                 r["foot"] = "right"
+                normalize_per_foot_record(r)
                 right.append(r)
         if not left and not right:
             continue
@@ -282,6 +307,7 @@ def process_nucleus_flat(athlete_dir: Path, activity_types: list[str] | None = N
                     gct = r.get("gct_ms")
                     if gct is not None and not (isinstance(gct, float) and pd.isna(gct)) and gct > 0:
                         r["foot"] = foot
+                        normalize_per_foot_record(r)
                         if is_sprint:
                             r["activity_label"] = "sprint"
                         valid.append(r)
@@ -623,7 +649,7 @@ def build_load_metrics(strides, distance_mi):
 def main():
     from insights import generate_insights
     from baseline import compute_baseline, compute_session_deviations, compute_status, compute_trend_narratives
-    from models import compute_fatigue_profile, predict_race_times
+    from models import compute_fatigue_profile, predict_race_times, assess_confidence, build_watch_list
 
     athletes_cfg = json.loads((DATA_DIR / "athletes.json").read_text())
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -687,11 +713,19 @@ def main():
         trend_narratives = compute_trend_narratives(sessions, baseline)
         fatigue_profile = compute_fatigue_profile(sessions)
         race_predictions = predict_race_times(sessions, fatigue_profile)
-        print(f"  Status: {status['level']} | {len(trend_narratives)} trend narratives")
+        # Confidence and watch list
+        if race_predictions.get("has_predictions"):
+            confidence = assess_confidence(race_predictions["model_inputs"], sessions)
+            race_predictions["confidence"] = confidence
+
+        watch_list = build_watch_list(sessions, fatigue_profile, baseline, trend_narratives)
+
+        print(f"  Status: {status['level']} | {len(trend_narratives)} trend narratives | {len(watch_list)} watch items")
         if race_predictions.get("has_predictions"):
             preds = race_predictions["predictions"]
+            conf = race_predictions.get("confidence", {})
             times_str = ", ".join(f"{k}: {v['predicted_time_fmt']}" for k, v in preds.items())
-            print(f"  Predicted: {times_str}")
+            print(f"  Predicted: {times_str} (confidence: {conf.get('label', '?')})")
 
         athlete_out = {
             "id": aid, "name": name,
@@ -704,6 +738,7 @@ def main():
             "trend_narratives": trend_narratives,
             "fatigue_profile": fatigue_profile,
             "race_predictions": race_predictions,
+            "watch_list": watch_list,
             "session_count": len(sessions),
             "total_strides": total,
             "date_range": {
@@ -765,6 +800,9 @@ def build_cross_athlete_summary(athletes):
             "alert_count": alert_count,
             "watch_count": watch_count,
             "headline_insight": a.get("insights", [{}])[0].get("title") if a.get("insights") else None,
+            "watch_list_count": len(a.get("watch_list", [])),
+            "watch_list_top": a.get("watch_list", [])[:3],
+            "prediction_confidence": a.get("race_predictions", {}).get("confidence", {}).get("level"),
         }
         rows.append(row)
         if m.get("avg_gct_ms"): all_gct.append(m["avg_gct_ms"])
@@ -776,9 +814,17 @@ def build_cross_athlete_summary(athletes):
 
     synthesis = generate_fleet_synthesis(athletes, rows)
 
+    fleet_watch = []
+    for a in athletes:
+        for item in a.get("watch_list", []):
+            if item.get("severity") in ("alert", "warn"):
+                fleet_watch.append({**item, "athlete": a["name"], "athlete_id": a["id"]})
+    fleet_watch.sort(key=lambda x: {"alert": 0, "warn": 1}.get(x["severity"], 9))
+
     return {
         "generated_at": datetime.now().isoformat(),
         "athletes": rows,
+        "fleet_watch_list": fleet_watch[:15],
         "fleet": {
             "total_athletes": len(athletes),
             "total_sessions": sum(a["session_count"] for a in athletes),
