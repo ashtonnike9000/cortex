@@ -6,7 +6,7 @@ const Plot = createPlotlyComponent(Plotly);
 
 const METRIC_DEFS = [
   { key: "pace", label: "Pace", unit: "min/mi", color: "#CDFF00", axis: "y", invert: true },
-  { key: "speed", label: "Speed (raw)", unit: "m/s", color: "#8aab00", axis: "y2" },
+  { key: "speed", label: "Speed", unit: "m/s", color: "#8aab00", axis: "y2" },
   { key: "gct", label: "GCT", unit: "ms", color: "#30d158", axis: "y3" },
   { key: "cadence", label: "Cadence", unit: "spm", color: "#ffd60a", axis: "y4" },
   { key: "vgrf_peak", label: "vGRF Peak", unit: "BW", color: "#ff453a", axis: "y5" },
@@ -29,24 +29,29 @@ function fmtPace(minPerMile) {
 export default function InteractiveSessionChart({
   timeSeries,
   activeMetrics = ["pace", "gct"],
+  dataMode = "smoothed",
+  overlayCompare = false,
   onToggleMetric,
   onRangeChange,
   height = 380,
 }) {
   const xVals = useMemo(() => timeSeries.map((p) => p.dist_mi), [timeSeries]);
+  const metricKey = useCallback((baseKey, mode) => (mode === "raw" ? `raw_${baseKey}` : baseKey), []);
 
   const traces = useMemo(() => {
-    return METRIC_DEFS
-      .filter((m) => activeMetrics.includes(m.key))
-      .map((m, i) => {
-        const yData = timeSeries.map((p) => p[m.key] ?? null);
+    const active = METRIC_DEFS.filter((m) => activeMetrics.includes(m.key));
+    const compareMode = dataMode === "raw" ? "smoothed" : "raw";
+    const built = [];
+
+    active.forEach((m, i) => {
+        const yData = timeSeries.map((p) => p[metricKey(m.key, dataMode)] ?? null);
         const isPace = m.key === "pace";
-        return {
+        built.push({
           x: xVals,
           y: yData,
           type: "scattergl",
           mode: "lines",
-          name: `${m.label} (${m.unit})`,
+          name: `${m.label} (${dataMode})`,
           yaxis: i === 0 ? "y" : `y${i + 1}`,
           line: { color: m.color, width: isPace ? 2.5 : 1.5 },
           hovertemplate: isPace
@@ -57,9 +62,30 @@ export default function InteractiveSessionChart({
             hovertemplate: "%{text} /mi<extra>Pace</extra>",
           } : {}),
           connectgaps: false,
-        };
+        });
+
+        if (overlayCompare) {
+          const yCompare = timeSeries.map((p) => p[metricKey(m.key, compareMode)] ?? null);
+          built.push({
+            x: xVals,
+            y: yCompare,
+            type: "scattergl",
+            mode: "lines",
+            name: `${m.label} (${compareMode})`,
+            yaxis: i === 0 ? "y" : `y${i + 1}`,
+            line: { color: m.color, width: isPace ? 1.8 : 1.2, dash: "dot" },
+            opacity: 0.55,
+            hovertemplate: isPace
+              ? "%{text} /mi<extra>Pace</extra>"
+              : `%{y:.2f} ${m.unit}<extra>${m.label} (${compareMode})</extra>`,
+            ...(isPace ? { text: yCompare.map((v) => fmtPace(v)) } : {}),
+            connectgaps: false,
+          });
+        }
       });
-  }, [timeSeries, activeMetrics, xVals]);
+
+    return built;
+  }, [timeSeries, activeMetrics, xVals, dataMode, overlayCompare, metricKey]);
 
   const layout = useMemo(() => {
     const active = METRIC_DEFS.filter((m) => activeMetrics.includes(m.key));

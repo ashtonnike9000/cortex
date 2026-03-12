@@ -580,9 +580,15 @@ def build_time_series(strides):
         pt["running"] = is_running_stride(s)
         points.append(pt)
 
+    # Preserve raw values for UI toggles before smoothing
+    SMOOTH_KEYS = ["speed", "gct", "cadence", "fsa", "vgrf", "vgrf_peak", "lr", "stride", "impulse"]
+    for mk in SMOOTH_KEYS:
+        for p in points:
+            v = p.get(mk)
+            p[f"raw_{mk}"] = round(v, 3) if isinstance(v, (int, float)) and v is not None else v
+
     # Apply rolling smooth to all metrics
     SMOOTH_WINDOW = 21
-    SMOOTH_KEYS = ["speed", "gct", "cadence", "fsa", "vgrf", "vgrf_peak", "lr", "stride", "impulse"]
     for mk in SMOOTH_KEYS:
         raw = [p.get(mk) for p in points]
         smoothed = _rolling_smooth(raw, SMOOTH_WINDOW)
@@ -590,13 +596,18 @@ def build_time_series(strides):
             if val is not None:
                 points[i][mk] = round(val, 3)
 
-    # Pace from smoothed speed
+    # Pace from smoothed speed + raw speed
     for p in points:
         s = p.get("speed")
         if s and s > 0.3:
             p["pace"] = round(26.8224 / s, 2)
         else:
             p["pace"] = None
+        rs = p.get("raw_speed")
+        if rs and rs > 0.3:
+            p["raw_pace"] = round(26.8224 / rs, 2)
+        else:
+            p["raw_pace"] = None
 
     return points
 

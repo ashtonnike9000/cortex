@@ -632,6 +632,8 @@ function SessionExplorer({ athlete }) {
   const sessions = athlete.sessions || [];
   const [selectedIdx, setSelectedIdx] = useState(sessions.length - 1);
   const [activeMetrics, setActiveMetrics] = useState(["pace", "gct"]);
+  const [dataMode, setDataMode] = useState("smoothed");
+  const [overlayCompare, setOverlayCompare] = useState(false);
   const [distRange, setDistRange] = useState(null);
   const [runOnly, setRunOnly] = useState(true);
 
@@ -647,6 +649,10 @@ function SessionExplorer({ athlete }) {
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
   }, []);
+  const modeKey = useCallback(
+    (baseKey) => (dataMode === "raw" ? `raw_${baseKey}` : baseKey),
+    [dataMode]
+  );
 
   const windowedMetrics = useMemo(() => {
     if (!ts.length) return null;
@@ -661,24 +667,24 @@ function SessionExplorer({ athlete }) {
       return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     };
 
-    const speeds = points.map((p) => p.speed);
+    const speeds = points.map((p) => p[modeKey("speed")]);
     const avgSpeed = avg(speeds);
     const distMin = points[0].dist_mi;
     const distMax = points[points.length - 1].dist_mi;
 
     return {
       avg_speed_mps: avgSpeed,
-      avg_gct_ms: avg(points.map((p) => p.gct)),
-      avg_cadence_spm: avg(points.map((p) => p.cadence)),
-      avg_fsa_deg: avg(points.map((p) => p.fsa)),
-      avg_vgrf_peak_bw: avg(points.map((p) => p.vgrf_peak)),
-      avg_stride_len_m: avg(points.map((p) => p.stride)),
-      avg_loading_rate: avg(points.map((p) => p.lr)),
+      avg_gct_ms: avg(points.map((p) => p[modeKey("gct")])),
+      avg_cadence_spm: avg(points.map((p) => p[modeKey("cadence")])),
+      avg_fsa_deg: avg(points.map((p) => p[modeKey("fsa")])),
+      avg_vgrf_peak_bw: avg(points.map((p) => p[modeKey("vgrf_peak")])),
+      avg_stride_len_m: avg(points.map((p) => p[modeKey("stride")])),
+      avg_loading_rate: avg(points.map((p) => p[modeKey("lr")])),
       distance_mi: distMax - distMin,
       n_points: points.length,
       pace: mpsToMinPerMile(avgSpeed),
     };
-  }, [ts, distRange]);
+  }, [ts, distRange, modeKey]);
 
   const speed = windowedMetrics?.avg_speed_mps ?? session.metrics?.avg_speed_mps;
   const pace = paceTag(speed);
@@ -708,9 +714,32 @@ function SessionExplorer({ athlete }) {
 
       {ts.length > 0 && (
         <div className="card">
+          <div className="data-mode-toggle">
+            <button
+              className={`dmt-pill ${dataMode === "smoothed" ? "active" : ""}`}
+              onClick={() => setDataMode("smoothed")}
+            >
+              Smoothed
+            </button>
+            <button
+              className={`dmt-pill ${dataMode === "raw" ? "active" : ""}`}
+              onClick={() => setDataMode("raw")}
+            >
+              Raw
+            </button>
+            <button
+              className={`dmt-pill ${overlayCompare ? "active" : ""}`}
+              onClick={() => setOverlayCompare((v) => !v)}
+              title="Overlay raw + smoothed together"
+            >
+              Overlay
+            </button>
+          </div>
           <InteractiveSessionChart
             timeSeries={ts}
             activeMetrics={activeMetrics}
+            dataMode={dataMode}
+            overlayCompare={overlayCompare}
             onToggleMetric={toggleMetric}
             onRangeChange={setDistRange}
             height={380}
