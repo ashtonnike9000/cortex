@@ -1,0 +1,785 @@
+.sl-page {
+  padding-bottom: 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+
+/* ================================================================
+   HERO
+   ================================================================ */
+
+.sl-hero {
+  padding: 5rem 0 3rem;
+  text-align: center;
+  position: relative;
+}
+
+.sl-hero::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(205, 255, 0, 0.04) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sl-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.sl-kicker {
+  font-size: 0.52rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+.sl-title {
+  font-size: 4.2rem;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sl-accent {
+  -webkit-text-fill-color: var(--accent);
+}
+
+.sl-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.85;
+  max-width: 560px;
+  margin: 1.75rem auto 0;
+}
+
+
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+
+.sl-section {
+  padding: 2.5rem 0;
+}
+
+.sl-section-label {
+  font-size: 0.52rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  margin-bottom: 0.7rem;
+}
+
+.sl-section-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  margin-bottom: 1.1rem;
+}
+
+.sl-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.85;
+  margin-bottom: 1.5rem;
+}
+
+.sl-text em {
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+.sl-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.5rem 0;
+}
+
+
+/* ================================================================
+   ATHLETE BAR
+   ================================================================ */
+
+.sl-athlete-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+}
+
+.sl-athlete-name {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.sl-athlete-event {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.sl-session-info {
+  text-align: right;
+}
+
+.sl-session-badge {
+  display: inline-flex;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.48rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(205, 255, 0, 0.1);
+  margin-bottom: 0.35rem;
+}
+
+.sl-session-desc {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sl-session-sub {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+
+/* ================================================================
+   PRE-SESSION CARDS
+   ================================================================ */
+
+.pre-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.pre-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.pre-card:hover {
+  border-color: var(--border);
+}
+
+.pre-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.pre-icon {
+  font-size: 1.3rem;
+}
+
+.pre-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.pre-source {
+  font-size: 0.48rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+}
+
+.pre-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.pre-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 55px;
+  padding: 0.4rem 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+.pre-metric-value {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.pre-metric-unit {
+  font-size: 0.4rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pre-metric-label {
+  font-size: 0.42rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.pre-extra {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 0.55rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 4px;
+}
+
+.pre-note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-style: italic;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+
+/* ── Pre-session synthesis ── */
+
+.pre-synthesis {
+  margin-top: 1.25rem;
+  background: linear-gradient(135deg, rgba(205, 255, 0, 0.02) 0%, var(--bg-card) 100%);
+  border: 1px solid rgba(205, 255, 0, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+}
+
+.pre-synthesis-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 0.55rem;
+  color: var(--accent);
+}
+
+.pre-synthesis-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+
+/* ================================================================
+   REP TABLE
+   ================================================================ */
+
+.rep-table-wrap {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.rep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.rep-table th {
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  font-size: 0.48rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.rep-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.rep-table tr:last-child td {
+  border-bottom: none;
+}
+
+.rep-table tr:hover {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.rep-num {
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.rep-time {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.rep-sub {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.rep-drift {
+  font-size: 0.55rem;
+  color: #ff9f0a;
+  font-weight: 700;
+  margin-left: 0.3rem;
+}
+
+.rep-warn {
+  color: #ff9f0a;
+  font-weight: 700;
+}
+
+.rep-row-last {
+  background: rgba(255, 69, 58, 0.03);
+}
+
+.rep-row-last td {
+  color: var(--text-primary);
+}
+
+
+/* ================================================================
+   REP CHART
+   ================================================================ */
+
+.rep-chart-section {
+  margin-bottom: 1.75rem;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+}
+
+.rep-chart-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 0.65rem;
+}
+
+.rep-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.rcl-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.rcl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rep-chart-wrap {
+  width: 100%;
+  aspect-ratio: 600 / 260;
+}
+
+.rep-chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.rep-chart-note {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 0.55rem;
+  text-align: center;
+}
+
+
+/* ================================================================
+   REP CARDS
+   ================================================================ */
+
+.rep-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.rep-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.rep-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+.rep-card-fatigue::before {
+  background: #ff9f0a;
+  opacity: 0.6;
+}
+
+.rep-card:hover {
+  border-color: var(--border);
+}
+
+.rc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.rc-num {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.rc-time {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.rc-metrics {
+  display: flex;
+  gap: 0.85rem;
+  margin-bottom: 0.65rem;
+}
+
+.rc-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.rc-metric-value {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.rc-metric-unit {
+  font-size: 0.42rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.rc-metric-label {
+  font-size: 0.42rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.rc-metric-warn .rc-metric-value {
+  color: #ff9f0a;
+}
+
+.rc-gct-range {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.rc-gct-label {
+  margin-right: 0.3rem;
+}
+
+.rc-gct-values {
+  font-family: "SF Mono", "Fira Code", monospace;
+  color: var(--text-secondary);
+}
+
+.rc-recovery {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.rc-notes {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+
+/* ================================================================
+   STORY CARDS
+   ================================================================ */
+
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.story-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+  transition: border-color 0.2s ease;
+}
+
+.story-card:hover {
+  border-color: var(--border);
+}
+
+.story-heading {
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin-bottom: 0.55rem;
+}
+
+.story-body {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+
+/* ================================================================
+   LEARNS CARDS
+   ================================================================ */
+
+.learns-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.learns-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+  transition: border-color 0.2s ease;
+}
+
+.learns-card:hover {
+  border-color: var(--border);
+}
+
+.learns-role {
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.learns-items {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.learns-item {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  padding-left: 0.85rem;
+  position: relative;
+}
+
+.learns-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.35;
+}
+
+
+/* ================================================================
+   COMPOUND ITEMS
+   ================================================================ */
+
+.compound-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.compound-item {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.35rem;
+  transition: border-color 0.2s ease;
+}
+
+.compound-item:hover {
+  border-color: var(--border);
+}
+
+.compound-sources {
+  display: inline-flex;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.65rem;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  margin-bottom: 0.55rem;
+}
+
+.compound-finding {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+
+/* ================================================================
+   CODA
+   ================================================================ */
+
+.sl-coda {
+  text-align: center;
+  padding: 4rem 0 2rem;
+}
+
+.sl-coda-line {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  line-height: 2.1;
+  margin-bottom: 1.75rem;
+}
+
+.sl-coda-line strong {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.sl-coda-sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.85;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 740px) {
+  .sl-title {
+    font-size: 2.8rem;
+  }
+
+  .sl-section-title {
+    font-size: 1.4rem;
+  }
+
+  .sl-athlete-bar {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .sl-session-info {
+    text-align: center;
+  }
+
+  .pre-grid,
+  .story-grid,
+  .learns-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rc-metrics {
+    flex-wrap: wrap;
+  }
+
+  .sl-hero {
+    padding: 3rem 0 2rem;
+  }
+}
